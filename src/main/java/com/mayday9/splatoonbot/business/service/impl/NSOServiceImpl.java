@@ -1,6 +1,5 @@
 package com.mayday9.splatoonbot.business.service.impl;
 
-import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -20,10 +19,12 @@ import com.mayday9.splatoonbot.common.util.core.DateUtil;
 import com.mayday9.splatoonbot.common.web.response.ApiException;
 import com.mayday9.splatoonbot.common.web.response.ExceptionCode;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -34,6 +35,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -419,37 +421,45 @@ public class NSOServiceImpl implements NSOService {
         battleDetailVO.setEnemyTeamPlayerList(enemyTeamPlayerList);
         battleDetailVO.generateRankScore();
         StringBuilder sb = new StringBuilder();
-        sb.append("==").append(battleDetailVO.getMatchName()).append("==\n")
-            .append("==[  ").append(battleDetailVO.getJudgement()).append("  ]==\n")
-            .append("----------------\n")
-            .append("*我方队伍*\n");
+        sb.append(battleDetailVO.getMatchName()).append("==[  ").append(battleDetailVO.getJudgement()).append("  ]==\n")
+            .append("===============\n")
+            .append("[emoji=D83C][emoji=DFAE]我方队伍\n");
         for (BattleDetailPlayerVO playerVO : battleDetailVO.getMyTeamPlayerList()) {
-            sb.append(playerVO.getPlayerName()).append("    ")
+            sb.append("[emoji=D83D][emoji=DD30]").append(playerVO.getPlayerName()).append("\n")
                 .append(playerVO.getKill()).append("(").append(playerVO.getAssist()).append(")/")
                 .append(playerVO.getDeath()).append("/")
                 .append(playerVO.getSpecial()).append("    ")
                 .append(playerVO.getPaint())
                 .append("p\n");
         }
-        sb.append("\n*敌方队伍*\n");
+        sb.append("\n[emoji=D83C][emoji=DFAE]敌方队伍\n");
         for (BattleDetailPlayerVO playerVO : battleDetailVO.getEnemyTeamPlayerList()) {
-            sb.append(playerVO.getPlayerName()).append("    ")
+            sb.append("[emoji=D83D][emoji=DD30]").append(playerVO.getPlayerName()).append("\n")
                 .append(playerVO.getKill()).append("(").append(playerVO.getAssist()).append(")/")
                 .append(playerVO.getDeath()).append("/")
                 .append(playerVO.getSpecial()).append("    ")
                 .append(playerVO.getPaint())
                 .append("p\n");
         }
-        sb.append("----------------\n排名\n");
+        sb.append("======排名======\n");
         List<BattleDetailPlayerVO> allPlayerList = new ArrayList<>();
         allPlayerList.addAll(battleDetailVO.getMyTeamPlayerList());
         allPlayerList.addAll(battleDetailVO.getEnemyTeamPlayerList());
         allPlayerList.sort(Comparator.comparing(BattleDetailPlayerVO::getRankScore, Comparator.reverseOrder()));
         int no = 1;
         for (BattleDetailPlayerVO playerVO : allPlayerList) {
-            sb.append(no).append(". ").append(playerVO.getPlayerName()).append(" ").append(playerVO.getRankScore());
             if (no == 1) {
-                sb.append("  本局MVP");
+                sb.append("[emoji=D83E][emoji=DD47]");
+            } else if (no == 2) {
+                sb.append("[emoji=D83E][emoji=DD48]");
+            } else if (no == 3) {
+                sb.append("[emoji=D83E][emoji=DD49]");
+            } else {
+                sb.append(" ").append(no).append(". ");
+            }
+            sb.append(playerVO.getPlayerName()).append("[emoji=D83C][emoji=DF88]").append(playerVO.getRankScore());
+            if (no == 1) {
+                sb.append("[emoji=D83C][emoji=DFC6]");
             }
             sb.append("\n");
             no++;
@@ -467,17 +477,21 @@ public class NSOServiceImpl implements NSOService {
      * @return String
      */
     private String requestGraphql(Map<String, Object> data, Boolean skipCheckToken, GraphqlRequestParameter graphqlRequestParameter) {
-        String apiUrl = NSOUtil.API_URL;
-        String graphqlUrl = NSOUtil.GRAPHQL_URL;
-        if (!skipCheckToken) {
-            // 请求首页，判断token是否过期，过期重新获取
-            prefetchChecks(graphqlUrl, apiUrl, graphqlRequestParameter);
+        try {
+            String apiUrl = NSOUtil.API_URL;
+            String graphqlUrl = NSOUtil.GRAPHQL_URL;
+            if (!skipCheckToken) {
+                // 请求首页，判断token是否过期，过期重新获取
+                prefetchChecks(graphqlUrl, apiUrl, graphqlRequestParameter);
+            }
+            Response response = NSOUtil.postGraphql(data, graphqlRequestParameter, apiUrl, graphqlUrl);
+            if (response.code() != 200) {
+                throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "tokens expired.");
+            }
+            return Objects.requireNonNull(response.body()).string();
+        } catch (Exception e) {
+            throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "请求失败，请联系管理员。");
         }
-        HttpResponse response = NSOUtil.postGraphql(data, graphqlRequestParameter, apiUrl, graphqlUrl);
-        if (response.getStatus() != 200) {
-            throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "tokens expired.");
-        }
-        return response.body();
     }
 
     /**
@@ -488,12 +502,12 @@ public class NSOServiceImpl implements NSOService {
      * @param graphqlRequestParameter 请求参数
      * @return void
      */
-    private void prefetchChecks(String graphqlUrl, String apiUrl, GraphqlRequestParameter graphqlRequestParameter) {
+    private void prefetchChecks(String graphqlUrl, String apiUrl, GraphqlRequestParameter graphqlRequestParameter) throws IOException {
         // Queries the SplatNet 3 homepage to check if our gtoken & bulletToken are still valid and regenerates them if not.
         Map<String, Object> data = NSOUtil.genGraphqlBody(NSOUtil.getTranslateRid("HomeQuery"), "naCountry", graphqlRequestParameter.getUserCountry());
-        HttpResponse response = NSOUtil.postGraphql(data, graphqlRequestParameter, apiUrl, graphqlUrl);
-        log.info(response.body());
-        if (response.getStatus() != 200) {
+        Response response = NSOUtil.postGraphql(data, graphqlRequestParameter, apiUrl, graphqlUrl);
+        log.info(Objects.requireNonNull(response.body()).string());
+        if (response.code() != 200) {
             log.info("tokens expired.");
             // 重新获取token
             GetGTokenAndBulletTokenResult getGTokenAndBulletTokenResult = NSOUtil.getGTokenAndBulletToken(graphqlRequestParameter.getSessionToken());

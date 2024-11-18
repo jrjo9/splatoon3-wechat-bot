@@ -11,6 +11,7 @@ import com.mayday9.splatoonbot.common.util.core.StringUtil;
 import com.mayday9.splatoonbot.common.web.response.ApiException;
 import com.mayday9.splatoonbot.common.web.response.ExceptionCode;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -122,7 +123,6 @@ public class NSOUtil {
             .timeout(60000)
             .form(paramMap)
             .execute();
-
         if (!response.isOk()) {
             throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "sessionTokenCode失效，请重新打开页面复制code");
         }
@@ -453,22 +453,24 @@ public class NSOUtil {
      * @param graphqlUrl              graphql地址
      * @return HttpResponse
      */
-    public static HttpResponse postGraphql(Map<String, Object> data, GraphqlRequestParameter graphqlRequestParameter, String apiUrl, String graphqlUrl) {
-        return HttpUtil.createPost(graphqlUrl)
-            .header("Authorization", "Bearer " + graphqlRequestParameter.getBulletToken())
-            .header("Accept-Language", graphqlRequestParameter.getUserLang())
-            .header("User-Agent", NSOUtil.APP_USER_AGENT)
-            .header("X-Web-View-Ver", NSOUtil.WEB_VIEW_VERSION)
-            .header("Content-Type", "application/json")
-            .header("Accept", "'*/*")
-            .header("Origin", apiUrl)
-            .header("X-Requested-With", "com.nintendo.znca")
-            .header("Referer", apiUrl + "/?lang=" + graphqlRequestParameter.getUserLang() + "&na_country=" + graphqlRequestParameter.getUserCountry() + "&na_lang=" + graphqlRequestParameter.getUserLang())
-            .header("Accept-Encoding", "gzip, deflate")
-            .cookie("_gtoken=" + graphqlRequestParameter.getGToken())
-            .body(JSONUtil.toJsonStr(data))
-            .timeout(20000)
-            .execute();
+    public static Response postGraphql(Map<String, Object> data, GraphqlRequestParameter graphqlRequestParameter, String apiUrl, String graphqlUrl) {
+        return OkHttpUtil.builder()
+            .url(graphqlUrl)
+            .addHeader("Authorization", "Bearer " + graphqlRequestParameter.getBulletToken())
+            .addHeader("Accept-Language", graphqlRequestParameter.getUserLang())
+            .addHeader("User-Agent", NSOUtil.APP_USER_AGENT)
+            .addHeader("X-Web-View-Ver", NSOUtil.WEB_VIEW_VERSION)
+            .addHeader("Content-Type", "application/json")
+            .addHeader("Accept", "'*/*")
+            .addHeader("Origin", apiUrl)
+            .addHeader("X-Requested-With", "com.nintendo.znca")
+            .addHeader("Referer", apiUrl + "/?lang=" + graphqlRequestParameter.getUserLang() + "&na_country=" + graphqlRequestParameter.getUserCountry() + "&na_lang=" + graphqlRequestParameter.getUserLang())
+            .addHeader("Accept-Encoding", "gzip, deflate")
+            .addHeader("Cookie", "_gtoken=" + graphqlRequestParameter.getGToken())
+            .addParamMap(data)
+            .post(true)
+            .syncWithResp();
+
     }
 
 }
