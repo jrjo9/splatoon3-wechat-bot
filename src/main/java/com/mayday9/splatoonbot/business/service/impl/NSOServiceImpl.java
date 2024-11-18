@@ -380,7 +380,7 @@ public class NSOServiceImpl implements NSOService {
         }
         String firstMatchId = nodes.getJSONObject(0).getJSONObject("historyDetails").getJSONArray("nodes").getJSONObject(0).getStr("id");
         log.debug("first match id is :{}", firstMatchId);
-        JSONObject matchDetail = this.getBattleDetail(graphqlRequestParameter, "VnNIaXN0b3J5RGV0YWlsLXUtYXRwbHYzZjd0aHIzNW5tYWJubW06UkVDRU5UOjIwMjQxMDI3VDE0Mjg0Ml9iNTQwMmIwMC1mMjhjLTQ0MDctYTllZi1hMGQ2ZDc1ZmI1MGE=");
+        JSONObject matchDetail = this.getBattleDetail(graphqlRequestParameter, firstMatchId);
         BattleDetailVO battleDetailVO = new BattleDetailVO();
         battleDetailVO.setMode(matchDetail.getJSONObject("data").getJSONObject("vsHistoryDetail").getJSONObject("vsMode").getStr("mode"));
         battleDetailVO.setMatchName(matchDetail.getJSONObject("data").getJSONObject("vsHistoryDetail").getJSONObject("vsRule").getStr("name"));

@@ -352,22 +352,21 @@ public class NSOUtil {
     private static String getBulletToken(String webServiceToken, String userLang, String userCountry) {
         log.debug("get bulletToken ...");
         String apiUrl = "https://api.lp1.av5ja.srv.nintendo.net";
-        HttpResponse response = HttpUtil.createPost(apiUrl + "/api/bullet_tokens")
-            .header("Content-Length", "0")
-            .header("Content-Type", "application/json")
-            .header("Accept-Language", userLang)
-            .header("User-Agent", APP_USER_AGENT)
-            .header("X-Web-View-Ver", WEB_VIEW_VERSION)
-            .header("X-NACOUNTRY", userCountry)
-            .header("Accept", "*/*")
-            .header("Origin", apiUrl)
-            .header("X-Requested-With", "com.nintendo.znca")
-            .cookie("_gtoken=" + webServiceToken)
-            .timeout(60000)
-            .execute();
-        log.info(response.body());
-        String resp = response.body();
-
+        String resp = OkHttpUtil.builder()
+            .url(apiUrl + "/api/bullet_tokens")
+            .addHeader("Content-Length", "0")
+            .addHeader("Content-Type", "application/json")
+            .addHeader("Accept-Language", userLang)
+            .addHeader("User-Agent", APP_USER_AGENT)
+            .addHeader("X-Web-View-Ver", WEB_VIEW_VERSION)
+            .addHeader("X-NACOUNTRY", userCountry)
+            .addHeader("Accept", "*/*")
+            .addHeader("Origin", apiUrl)
+            .addHeader("X-Requested-With", "com.nintendo.znca")
+            .addHeader("Cookie", "_gtoken=" + webServiceToken)
+            .post(true)
+            .sync();
+        log.info(resp);
         JSONObject jsonObject = JSONUtil.parseObj(resp);
         String bulletToken = jsonObject.getStr("bulletToken");
         log.debug("bullet token : {}", bulletToken);
