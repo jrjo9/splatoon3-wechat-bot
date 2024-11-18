@@ -1,0 +1,33 @@
+server:
+  port: 9941 #启动端口
+
+spring:
+  application:
+    name: splatoon3-wechat-bot
+  banner:
+    charset: UTF-8
+    location: classpath:banner.txt
+  profiles:
+    active: dev
+
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          autoconfigure:
+            logging: info
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    call-setters-on-nulls: true
+    jdbc-type-for-null: null
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      update-strategy: ignored
+      field-strategy: NOT_EMPTY
+      db-type: MYSQL
+  mapper-locations: classpath*:/mapper/*.xml
+  type-enums-package: com.mayday9.splatoonbot.common.enums

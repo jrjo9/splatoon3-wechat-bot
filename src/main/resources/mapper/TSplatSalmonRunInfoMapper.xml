@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mayday9.splatoonbot.business.infrastructure.mapper.TSplatSalmonRunInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.mayday9.splatoonbot.business.entity.TSplatSalmonRunInfo">
+        <result column="id" property="id"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="salmon_run_type" property="salmonRunType"/>
+        <result column="boss_keyword" property="bossKeyword"/>
+        <result column="boss_name" property="bossName"/>
+        <result column="stage_keyword" property="stageKeyword"/>
+        <result column="stage_name" property="stageName"/>
+        <result column="stage_thumbnail_image" property="stageThumbnailImage"/>
+        <result column="stage_image" property="stageImage"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+                    is_delete,
+                    create_by,
+                    update_by,
+                    create_time,
+                    update_time,
+                start_time, end_time, salmon_run_type, boss_keyword, boss_name, stage_keyword, stage_name, stage_thumbnail_image, stage_image
+    </sql>
+
+    <resultMap id="findMatchByDateResultMap" type="com.mayday9.splatoonbot.business.vo.TSplatSalmonRunInfoVO">
+        <id column="id" property="id"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="salmon_run_type" property="salmonRunType"/>
+        <result column="boss_name" property="bossName"/>
+        <result column="boss_cn_name" property="bossCnName"/>
+        <result column="stage_name" property="stageName"/>
+        <result column="stage_cn_name" property="stageCnName"/>
+        <result column="stage_image_file_url" property="stageImageFileUrl"/>
+        <collection property="weaponList" ofType="com.mayday9.splatoonbot.business.vo.TSplatSalmonRunWeaponVO" javaType="java.util.List">
+            <id column="salmon_run_weapon_id" property="salmonRunWeaponId"/>
+            <result column="weapon_cn_name" property="weaponName"/>
+            <result column="weapon_image_file_url" property="weaponImageFileUrl"/>
+        </collection>
+    </resultMap>
+
+    <select id="findMatchByDate" resultMap="findMatchByDateResultMap">
+
+        SELECT a.id,
+               sw.id       salmon_run_weapon_id,
+               a.start_time,
+               a.end_time,
+               a.salmon_run_type,
+               a.boss_name,
+               bc.cn_name  boss_cn_name,
+               s.stage_name,
+               sc.cn_name  stage_cn_name,
+               sf.file_url stage_image_file_url,
+               sw.weapon_name,
+               wc.cn_name  weapon_cn_name,
+               wf.file_url weapon_image_file_url
+        FROM (SELECT m.id,
+                     m.start_time,
+                     m.end_time,
+                     m.salmon_run_type,
+                     m.boss_name,
+                     m.boss_keyword,
+                     m.stage_keyword
+              FROM t_splat_salmon_run_info m
+              WHERE m.start_time &lt;= DATE_FORMAT(#{date}, '%Y-%m-%d %H:%M:%S')
+                and m.end_time >= DATE_FORMAT(#{date}, '%Y-%m-%d %H:%M:%S')
+              ORDER BY m.end_time desc
+              LIMIT 1) a
+                 LEFT JOIN t_lang_cn bc ON bc.keyword = a.boss_keyword and bc.type = 'bosses'
+                 LEFT JOIN t_splat_salmon_run_weapon sw ON a.id = sw.salmon_run_main_id
+                 LEFT JOIN t_splat_weapon w ON w.keyword = sw.weapon_keyword
+                 LEFT JOIN t_lang_cn wc ON w.keyword = wc.keyword and wc.type = 'weapons'
+                 LEFT JOIN t_splat_salmon_run_stage s ON a.stage_keyword = s.stage_keyword
+                 LEFT JOIN t_lang_cn sc ON s.stage_keyword = sc.keyword and sc.type = 'stages'
+                 LEFT JOIN t_sys_file sf ON sf.biz_id = s.id and sf.biz_args = 'salmon_run_stage'
+                 left join t_sys_file wf on wf.biz_id = w.id and wf.biz_args = 'weapon'
+
+        union all
+
+        SELECT a.id,
+               sw.id       salmon_run_weapon_id,
+               a.start_time,
+               a.end_time,
+               a.salmon_run_type,
+               a.boss_name,
+               bc.cn_name  boss_cn_name,
+               s.stage_name,
+               sc.cn_name  stage_cn_name,
+               sf.file_url stage_image_file_url,
+               sw.weapon_name,
+               wc.cn_name  weapon_cn_name,
+               wf.file_url weapon_image_file_url
+        FROM (SELECT m.id,
+                     m.start_time,
+                     m.end_time,
+                     m.salmon_run_type,
+                     m.boss_name,
+                     m.boss_keyword,
+                     m.stage_keyword
+              FROM t_splat_salmon_run_info m
+              WHERE m.start_time >= DATE_FORMAT(#{date}, '%Y-%m-%d %H:%M:%S')
+              ORDER BY m.start_time
+              LIMIT #{matchNumber}) a
+                 LEFT JOIN t_lang_cn bc ON bc.keyword = a.boss_keyword and bc.type = 'bosses'
+                 LEFT JOIN t_splat_salmon_run_weapon sw ON a.id = sw.salmon_run_main_id
+                 LEFT JOIN t_splat_weapon w ON w.keyword = sw.weapon_keyword
+                 LEFT JOIN t_lang_cn wc ON w.keyword = wc.keyword and wc.type = 'weapons'
+                 LEFT JOIN t_splat_salmon_run_stage s ON a.stage_keyword = s.stage_keyword
+                 LEFT JOIN t_lang_cn sc ON s.stage_keyword = sc.keyword and sc.type = 'stages'
+                 LEFT JOIN t_sys_file sf ON sf.biz_id = s.id and sf.biz_args = 'salmon_run_stage'
+                 left join t_sys_file wf on wf.biz_id = w.id and wf.biz_args = 'weapon'
+    </select>
+
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mayday9.splatoonbot.business.infrastructure.mapper.TLangCnMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.mayday9.splatoonbot.business.entity.TLangCn">
+        <id column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="keyword" property="keyword"/>
+        <result column="cn_name" property="cnName"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, type, keyword, cn_name, is_delete, create_by, update_by, create_time, update_time
+    </sql>
+
+</mapper>

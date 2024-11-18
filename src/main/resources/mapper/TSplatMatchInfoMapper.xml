@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mayday9.splatoonbot.business.infrastructure.mapper.TSplatMatchInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.mayday9.splatoonbot.business.entity.TSplatMatchInfo">
+        <result column="id" property="id"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="match_type" property="matchType"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+                    is_delete,
+                    create_by,
+                    update_by,
+                    create_time,
+                    update_time,
+                start_time, end_time, match_type
+    </sql>
+
+    <resultMap id="findMatchByDateResultMap" type="com.mayday9.splatoonbot.business.vo.TSplatMatchInfoVO">
+        <id column="match_id" property="matchId"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="match_type" property="matchType"/>
+        <collection property="matchInfoDetailVOList" ofType="com.mayday9.splatoonbot.business.vo.TSplatMatchInfoDetailVO" javaType="java.util.List">
+            <id column="match_detail_id" property="matchDetailId"/>
+            <result column="vs_stage_id" property="vsStageId"/>
+            <result column="match_rule" property="matchRule"/>
+            <result column="match_mode" property="matchMode"/>
+            <result column="vs_stage_name" property="vsStageName"/>
+            <result column="cn_name" property="cnName"/>
+            <result column="file_title" property="fileTitle"/>
+            <result column="file_url" property="fileUrl"/>
+        </collection>
+    </resultMap>
+
+    <select id="findMatchByDate" resultMap="findMatchByDateResultMap">
+        SELECT m1.id match_id,
+        m1.start_time,
+        m1.end_time,
+        m1.match_type,
+        md.id match_detail_id,
+        md.vs_stage_id,
+        md.match_rule,
+        md.match_mode,
+        vs.vs_stage_name,
+        c.cn_name,
+        f.file_title,
+        f.file_url
+        FROM (SELECT m.id,
+        m.start_time,
+        m.end_time,
+        m.match_type
+        FROM t_splat_match_info m
+        WHERE m.start_time >= DATE_FORMAT(#{date}, '%Y-%m-%d %H:%M:%S')
+        <choose>
+            <when test="matchType == 'bankara'">
+                and m.match_type in ('bankara', 'fest')
+            </when>
+            <otherwise>
+                and m.match_type = #{matchType}
+            </otherwise>
+        </choose>
+        ORDER BY m.start_time
+        LIMIT #{matchNumber}) m1
+        LEFT JOIN t_splat_match_info_detail md ON m1.id = md.match_id
+        LEFT JOIN t_splat_vs_stage vs ON md.vs_stage_id = vs.vs_stage_id
+        LEFT JOIN t_lang_cn c ON vs.keyword = c.keyword and c.type = 'stages'
+        LEFT JOIN t_sys_file f ON f.biz_id = vs.id and f.biz_args = 'vs_stage'
+        ORDER BY m1.start_time,
+        md.match_mode
+    </select>
+
+</mapper>

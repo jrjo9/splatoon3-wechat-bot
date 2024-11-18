@@ -1,0 +1,26 @@
+spring:
+  profiles: dev
+  datasource:
+    #公司病案的文件服务数据库
+    url: jdbc:mysql://127.0.0.1:3306/wx-bot?autoReconnect=true&allowMultiQueries=true&useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: username
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 20
+      min-idle: 5
+      max-active: 100
+
+paipai:
+  server:
+    host: 127.0.0.1
+    port: 7717
+    token: AAAAAA
+
+file:
+  uploadFolder: D://wxBot/
+
+qianfan:
+  accessKey: AAAA
+  secretKey: BBBBB

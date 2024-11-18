@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mayday9.splatoonbot.business.infrastructure.mapper.TBasicWxUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.mayday9.splatoonbot.business.entity.TBasicWxUser">
+        <result column="id" property="id"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="wxid" property="wxid"/>
+        <result column="username" property="username"/>
+        <result column="gid" property="gid"/>
+        <result column="salmon_eggs" property="salmonEggs"/>
+        <result column="sign_in_days_keep" property="signInDaysKeep"/>
+        <result column="sign_in_days_total" property="signInDaysTotal"/>
+        <result column="last_sign_in_time" property="lastSignInTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+                    is_delete,
+                    create_by,
+                    update_by,
+                    create_time,
+                    update_time,
+                wxid, username, gid, salmon_eggs, sign_in_days_keep, sign_in_days_total, last_sign_in_time
+    </sql>
+
+    <resultMap id="GroupWxUserInfoDTOResultMap" type="com.mayday9.splatoonbot.business.dto.basic.GroupWxUserInfoDTO">
+        <result column="gid" property="gid"/>
+        <result column="group_name" property="groupName"/>
+        <result column="active_flag" property="activeFlag"/>
+        <result column="user_id" property="userId"/>
+        <result column="wxid" property="wxid"/>
+        <result column="username" property="username"/>
+        <result column="salmon_eggs" property="salmonEggs"/>
+        <result column="sign_in_days_keep" property="signInDaysKeep"/>
+        <result column="sign_in_days_total" property="signInDaysTotal"/>
+        <result column="last_sign_in_time" property="lastSignInTime"/>
+    </resultMap>
+
+    <select id="findGroupWxUserInfo" resultMap="GroupWxUserInfoDTOResultMap">
+        SELECT g.gid,
+               g.group_name,
+               g.active_flag,
+               u.id user_id,
+               u.wxid,
+               u.username,
+               u.salmon_eggs,
+               u.sign_in_days_keep,
+               u.sign_in_days_total,
+               u.last_sign_in_time
+        FROM t_basic_wx_group g
+                 LEFT JOIN t_basic_wx_user u ON g.gid = u.gid
+        WHERE g.active_flag = '1'
+          and g.gid = #{gid}
+          and u.wxid = #{wxid}
+    </select>
+
+</mapper>
