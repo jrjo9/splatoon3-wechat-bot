@@ -1,6 +1,5 @@
 package com.mayday9.splatoonbot.business.task;
 
-import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -53,7 +52,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -117,7 +115,7 @@ public class SplatDataRefreshTask {
             .addHeader(":path", "/data/schedules.json")
             .addHeader(":scheme", "https")
             .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;g=0.9,image/avif,image/webp,image/apng,*/*;g=0.8,application/signed-exchange;v=b3;q=0.7")
-            .addHeader("Accept-Encoding", "gzip, deflate, br, zstd")
+//            .addHeader("Accept-Encoding", "gzip, deflate, br, zstd")
             .addHeader("Accept-Language", "zh-CN,zh;g=0.9")
             .addHeader("Cache-Control", "no-cache")
             .addHeader("Pragma", "no-cache")
@@ -474,7 +472,7 @@ public class SplatDataRefreshTask {
             .addHeader(":path", "/data/locale/zh-CN.json")
             .addHeader(":scheme", "https")
             .addHeader("accept", "text/html,application/xhtml+xml,application/xml;g=0.9,image/avif,image/webp,image/apng,*/*;g=0.8,application/signed-exchange;v=b3;q=0.7")
-            .addHeader("Accept-Encoding", "gzip, deflate, br, zstd")
+//            .addHeader("Accept-Encoding", "gzip, deflate, br, zstd")
             .addHeader("Accept-Language", "zh-CN,zh;g=0.9")
             .addHeader("Cache-Control", "no-cache")
             .addHeader("Pragma", "no-cache")

@@ -190,6 +190,9 @@ public class NSOUtil {
         JSONObject getTokenRespJSONObject = JSONUtil.parseObj(getTokenResp);
         String accessToken = getTokenRespJSONObject.getStr("access_token");
         String idToken = getTokenRespJSONObject.getStr("id_token");
+        if (StringUtil.isEmpty(accessToken) || StringUtil.isEmpty(idToken)) {
+            throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "登录过期，请重新登录。");
+        }
 
         //  根据access token获取用户信息
         String getMeUrl = "https://api.accounts.nintendo.com/2.0.0/users/me";

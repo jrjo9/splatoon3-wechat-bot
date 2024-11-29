@@ -489,7 +489,7 @@ public class NSOServiceImpl implements NSOService {
                 throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "tokens expired.");
             }
             return Objects.requireNonNull(response.body()).string();
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "请求失败，请联系管理员。");
         }
     }

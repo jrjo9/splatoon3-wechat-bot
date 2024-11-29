@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.text.Normalizer;
 
 /**
  * @author Lianjiannan
@@ -129,8 +130,13 @@ public class WxMsgSendUtil {
      * @return String
      */
     public static String chinaToUnicode(String str) {
+        str = removeAccents(str);
         StringBuilder result = new StringBuilder();
         for (char c : str.toCharArray()) {
+            if (c == '\'') {
+                // 上引号不处理
+                continue;
+            }
 //            if (isChinese(c) || isJapanese(c)) {
             if (c != '\\' && !isEnglishOrDigitOrSymbolOrNewLine(c)) {
                 // 不为数字、字母、英文符号、回车符的需要转换成unicode编码，否则发送微信文本出现乱码
@@ -140,6 +146,11 @@ public class WxMsgSendUtil {
             }
         }
         return result.toString();
+    }
+
+    public static String removeAccents(String text) {
+        return Normalizer.normalize(text, Normalizer.Form.NFD)
+            .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
 
     public static boolean isAlphaNumeric(char ch) {
