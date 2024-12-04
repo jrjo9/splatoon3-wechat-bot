@@ -190,7 +190,7 @@ public class SplatDataRefreshTask {
             tSysFileDao.saveBatch(fileInsertList);
         }
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(4);
+        ExecutorService threadPool = Executors.newFixedThreadPool(5);
         try {
             // 2、存储涂地信息
             threadPool.execute(() -> this.saveOrUpdateRegularMatchInfo(data));
@@ -453,7 +453,7 @@ public class SplatDataRefreshTask {
 
     @Transactional(rollbackFor = Exception.class)
     public void invokeLangCnDataRefreshOnce() throws Exception {
-        this.invokeSplatDataRefresh();
+        this.invokeLangCnDataRefresh();
     }
 
     /**

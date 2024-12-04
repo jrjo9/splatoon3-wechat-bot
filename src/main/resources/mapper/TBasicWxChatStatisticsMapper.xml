@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mayday9.splatoonbot.business.infrastructure.mapper.TBasicWxChatStatisticsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.mayday9.splatoonbot.business.entity.TBasicWxChatStatistics">
+        <result column="id" property="id"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="chat_date" property="chatDate"/>
+        <result column="gid" property="gid"/>
+        <result column="wxid" property="wxid"/>
+        <result column="chat_num" property="chatNum"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+                    is_delete,
+                    create_by,
+                    update_by,
+                    create_time,
+                    update_time,
+                chat_date, gid, wxid, chat_num
+    </sql>
+
+    <select id="findStatisticsRankByDate" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        t_basic_wx_chat_statistics
+        WHERE
+        chat_date = DATE_FORMAT(#{chatDate},'%Y-%m-%d')
+        and gid = #{gid}
+        ORDER BY
+        chat_num DESC
+        LIMIT 10
+    </select>
+
+    <select id="findMonthTalkUserList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        t_basic_wx_chat_statistics
+        WHERE
+        DATE_FORMAT(chat_date, '%m-%d') = DATE_FORMAT(#{chatDate}, '%m-%d')
+        and gid = #{gid}
+    </select>
+
+    <select id="findByGroupUserDate" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        t_basic_wx_chat_statistics
+        WHERE
+        chat_date = DATE_FORMAT(#{chatDate},'%Y-%m-%d')
+        and gid = #{gid}
+        and wxid = #{wxid}
+        limit 1
+    </select>
+
+</mapper>

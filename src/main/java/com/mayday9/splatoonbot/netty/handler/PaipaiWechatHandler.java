@@ -46,23 +46,23 @@ public class PaipaiWechatHandler extends ChannelInboundHandlerAdapter {
         int numberOfCPUCores = Runtime.getRuntime().availableProcessors();
         log.info("numberOfCPUCores:{}", numberOfCPUCores);
         executor = new ThreadPoolExecutor(numberOfCPUCores * 2,
-                numberOfCPUCores * 2,
-                0,
-                TimeUnit.MILLISECONDS,
-                new ArrayBlockingQueue<>(1000),
-                (r, executor) -> {
-                    // 重新塞回队列
-                    try {
-                        log.debug("线程池拒绝策略..., 准备重新提交");
-                        // 等待1秒
-                        Thread.sleep(1000);
-                        // 重新提交任务到队列
-                        executor.getQueue().put(r);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
-
+            numberOfCPUCores * 2,
+            0,
+            TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<>(1000),
+            (r, executor) -> {
+                // 重新塞回队列
+                try {
+                    log.debug("线程池拒绝策略..., 准备重新提交");
+                    // 等待1秒
+                    Thread.sleep(1000);
+                    // 重新提交任务到队列
+                    executor.getQueue().put(r);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
+
+            }
         );
     }
 
@@ -131,6 +131,17 @@ public class PaipaiWechatHandler extends ChannelInboundHandlerAdapter {
                 }
                 String finalTextMsg = textMsg;
                 executor.execute(() -> {
+                    // 判断是否为群聊，记录聊天次数
+                    if (wechatMessage.getWxid().contains("@chatroom")) {
+                        PaipaiWxMsgStrategy wxMsgStrategy = paipaiWxMsgStrategyContext.getResource(WxMsgConstant.COUNT_CHAT);
+                        if (wxMsgStrategy != null) {
+                            try {
+                                wxMsgStrategy.doStrategyBusiness(wechatMessage);
+                            } catch (Exception e) {
+                                log.error("记录聊天数量失败！", e);
+                            }
+                        }
+                    }
                     // 业务处理
                     PaipaiWxMsgStrategy wxMsgStrategy = paipaiWxMsgStrategyContext.getResource(finalTextMsg);
                     if (wxMsgStrategy != null) {

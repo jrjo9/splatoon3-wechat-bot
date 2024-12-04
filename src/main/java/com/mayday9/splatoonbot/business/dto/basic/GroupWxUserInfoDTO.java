@@ -35,6 +35,9 @@ public class GroupWxUserInfoDTO {
     @ApiModelProperty(value = "用户名称")
     private String username;
 
+    @ApiModelProperty(value = "用户群昵称")
+    private String nickname;
+
     @ApiModelProperty(value = "鲑鱼蛋数量")
     private Integer salmonEggs;
 

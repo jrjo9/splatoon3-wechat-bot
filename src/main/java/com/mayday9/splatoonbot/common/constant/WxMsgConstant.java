@@ -41,4 +41,10 @@ public class WxMsgConstant {
 
     public final static String HELP = "。帮助";
 
+    public final static String COUNT_CHAT = "。记录用户聊天数量（该功能不开放）";
+
+    public final static String TODAY_STATISTICS = "。龙王";
+
+    public final static String MONTH_NO_TALK_STATISTICS = "。当月未发言人员";
+
 }

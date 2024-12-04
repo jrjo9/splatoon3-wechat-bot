@@ -14,6 +14,7 @@
         <result column="wxid" property="wxid"/>
         <result column="username" property="username"/>
         <result column="gid" property="gid"/>
+        <result column="nickname" property="nickname"/>
         <result column="salmon_eggs" property="salmonEggs"/>
         <result column="sign_in_days_keep" property="signInDaysKeep"/>
         <result column="sign_in_days_total" property="signInDaysTotal"/>
@@ -28,7 +29,7 @@
                     update_by,
                     create_time,
                     update_time,
-                wxid, username, gid, salmon_eggs, sign_in_days_keep, sign_in_days_total, last_sign_in_time
+                wxid, username, gid, nickname, salmon_eggs, sign_in_days_keep, sign_in_days_total, last_sign_in_time
     </sql>
 
     <resultMap id="GroupWxUserInfoDTOResultMap" type="com.mayday9.splatoonbot.business.dto.basic.GroupWxUserInfoDTO">
@@ -51,6 +52,7 @@
                u.id user_id,
                u.wxid,
                u.username,
+               u.nickname,
                u.salmon_eggs,
                u.sign_in_days_keep,
                u.sign_in_days_total,

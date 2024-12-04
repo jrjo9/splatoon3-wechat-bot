@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.mayday9</groupId>
     <artifactId>splatoonbot</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
     <name>splatoonbot</name>
     <description>splatoonbot</description>
     <packaging>war</packaging>

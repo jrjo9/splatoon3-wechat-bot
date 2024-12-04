@@ -34,7 +34,7 @@ public class CodeGenerator {
         defaultConfig.getStrategy().setEntityLombokModel(true);
         //需要生成的表，可指定多个，留空为全部生成
         defaultConfig.getStrategy().setInclude(
-            "t_basic_wx_user_nso"
+            "t_basic_wx_chat_statistics"
         );
         BaseCodeGenerator.generate(defaultConfig);
     }
