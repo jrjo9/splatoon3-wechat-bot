@@ -1,6 +1,8 @@
 package com.mayday9.splatoonbot.business.infrastructure.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mayday9.splatoonbot.business.dto.statistics.FindMonthTalkUserDTO;
+import com.mayday9.splatoonbot.business.dto.statistics.TodayStatisticsRankDTO;
 import com.mayday9.splatoonbot.business.entity.TBasicWxChatStatistics;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -24,7 +26,7 @@ public interface TBasicWxChatStatisticsMapper extends BaseMapper<TBasicWxChatSta
      * @param chatDate 日期
      * @return List<TBasicWxChatStatistics>
      */
-    List<TBasicWxChatStatistics> findStatisticsRankByDate(@Param("chatDate") Date chatDate, @Param("gid") String gid);
+    List<TodayStatisticsRankDTO> findStatisticsRankByDate(@Param("chatDate") Date chatDate, @Param("gid") String gid);
 
     /**
      * 查询月未说话用户
@@ -32,7 +34,7 @@ public interface TBasicWxChatStatisticsMapper extends BaseMapper<TBasicWxChatSta
      * @param chatDate 日期
      * @return List<TBasicWxChatStatistics>
      */
-    List<TBasicWxChatStatistics> findMonthTalkUserList(@Param("chatDate") Date chatDate, @Param("gid") String gid);
+    List<FindMonthTalkUserDTO> findMonthTalkUserList(@Param("chatDate") Date chatDate, @Param("gid") String gid);
 
     TBasicWxChatStatistics findByGroupUserDate(Map<String, Object> param);
 }

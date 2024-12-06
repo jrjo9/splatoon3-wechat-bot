@@ -47,4 +47,5 @@ public class WxMsgConstant {
 
     public final static String MONTH_NO_TALK_STATISTICS = "。当月未发言人员";
 
+    public static final String AUTO_STATISTICS_SWITCH = "。每日龙王群推送";
 }

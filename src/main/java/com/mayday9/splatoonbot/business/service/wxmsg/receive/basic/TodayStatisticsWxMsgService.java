@@ -3,6 +3,7 @@ package com.mayday9.splatoonbot.business.service.wxmsg.receive.basic;
 import com.mayday9.splatoonbot.business.dto.statistics.TodayStatisticsRankDTO;
 import com.mayday9.splatoonbot.business.service.GroupStatisticsService;
 import com.mayday9.splatoonbot.business.service.wxmsg.send.TextWxMsgSender;
+import com.mayday9.splatoonbot.common.annotation.AuthWxMsg;
 import com.mayday9.splatoonbot.common.constant.WxMsgConstant;
 import com.mayday9.splatoonbot.common.dto.WechatMessage;
 import com.mayday9.splatoonbot.netty.annotation.WxMsgType;
@@ -10,7 +11,6 @@ import com.mayday9.splatoonbot.netty.strategy.PaipaiWxMsgStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -32,6 +32,7 @@ public class TodayStatisticsWxMsgService extends PaipaiWxMsgStrategy {
     private GroupStatisticsService groupStatisticsService;
 
     @Override
+    @AuthWxMsg
     public void doBusiness(WechatMessage wechatMessage) throws Exception {
         if (!wechatMessage.getWxid().contains("@chatroom")) {
             return;

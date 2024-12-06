@@ -3,6 +3,8 @@ package com.mayday9.splatoonbot.business.infrastructure.dao.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
+import com.mayday9.splatoonbot.business.dto.statistics.FindMonthTalkUserDTO;
+import com.mayday9.splatoonbot.business.dto.statistics.TodayStatisticsRankDTO;
 import com.mayday9.splatoonbot.business.entity.TBasicWxChatStatistics;
 import com.mayday9.splatoonbot.business.infrastructure.dao.TBasicWxChatStatisticsDao;
 import com.mayday9.splatoonbot.business.infrastructure.mapper.TBasicWxChatStatisticsMapper;
@@ -121,7 +123,7 @@ public class TBasicWxChatStatisticsDaoImpl extends BaseDaoImpl<TBasicWxChatStati
      * @return List<TBasicWxChatStatistics>
      */
     @Override
-    public List<TBasicWxChatStatistics> findStatisticsRankByDate(Date chatDate, String gid) {
+    public  List<TodayStatisticsRankDTO> findStatisticsRankByDate(Date chatDate, String gid) {
         return baseMapper.findStatisticsRankByDate(chatDate, gid);
     }
 
@@ -132,7 +134,7 @@ public class TBasicWxChatStatisticsDaoImpl extends BaseDaoImpl<TBasicWxChatStati
      * @return List<TBasicWxChatStatistics>
      */
     @Override
-    public List<TBasicWxChatStatistics> findMonthTalkUserList(Date chatDate, String gid) {
+    public List<FindMonthTalkUserDTO> findMonthTalkUserList(Date chatDate, String gid) {
         return baseMapper.findMonthTalkUserList(chatDate, gid);
     }
 

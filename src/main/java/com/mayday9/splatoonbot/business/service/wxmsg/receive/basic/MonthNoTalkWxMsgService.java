@@ -3,6 +3,7 @@ package com.mayday9.splatoonbot.business.service.wxmsg.receive.basic;
 import com.mayday9.splatoonbot.business.dto.statistics.MonthNoTalkUserDTO;
 import com.mayday9.splatoonbot.business.service.GroupStatisticsService;
 import com.mayday9.splatoonbot.business.service.wxmsg.send.TextWxMsgSender;
+import com.mayday9.splatoonbot.common.annotation.AuthWxMsg;
 import com.mayday9.splatoonbot.common.constant.WxMsgConstant;
 import com.mayday9.splatoonbot.common.dto.WechatMessage;
 import com.mayday9.splatoonbot.common.util.core.StringUtil;
@@ -33,6 +34,7 @@ public class MonthNoTalkWxMsgService extends PaipaiWxMsgStrategy {
     private TextWxMsgSender textWxMsgSender;
 
     @Override
+    @AuthWxMsg
     public void doBusiness(WechatMessage wechatMessage) throws Exception {
         if (!wechatMessage.getWxid().contains("@chatroom")) {
             return;

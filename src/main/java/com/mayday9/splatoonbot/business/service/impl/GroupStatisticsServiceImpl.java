@@ -1,5 +1,6 @@
 package com.mayday9.splatoonbot.business.service.impl;
 
+import com.mayday9.splatoonbot.business.dto.statistics.FindMonthTalkUserDTO;
 import com.mayday9.splatoonbot.business.dto.statistics.MonthNoTalkUserDTO;
 import com.mayday9.splatoonbot.business.dto.statistics.TodayStatisticsRankDTO;
 import com.mayday9.splatoonbot.business.dto.wxmsg.resp.WxGroupUserInfoDetailRespDTO;
@@ -10,7 +11,7 @@ import com.mayday9.splatoonbot.business.infrastructure.dao.TBasicWxChatStatistic
 import com.mayday9.splatoonbot.business.infrastructure.dao.TBasicWxUserDao;
 import com.mayday9.splatoonbot.business.service.GroupStatisticsService;
 import com.mayday9.splatoonbot.business.service.wxmsg.query.WxGroupUserListQueryService;
-import com.mayday9.splatoonbot.business.service.wxmsg.query.WxGroupUserNameQueryService;
+import com.mayday9.splatoonbot.business.service.wxmsg.query.WxGroupUserNickNameQueryService;
 import com.mayday9.splatoonbot.business.service.wxmsg.query.WxUserInfoQueryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class GroupStatisticsServiceImpl implements GroupStatisticsService {
     private WxGroupUserListQueryService wxGroupUserListQueryService;
 
     @Resource
-    private WxGroupUserNameQueryService wxGroupUserNameQueryService;
+    private WxGroupUserNickNameQueryService WxGroupUserNickNameQueryService;
 
     @Resource
     private WxUserInfoQueryService wxUserInfoQueryService;
@@ -84,21 +85,17 @@ public class GroupStatisticsServiceImpl implements GroupStatisticsService {
      * @param gid 群组ID
      * @return List<TodayStatisticsRankDTO>
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public List<TodayStatisticsRankDTO> getTodayStatisticsRank(String gid) {
+        this.updateGroup(gid);
         Date chatDate = new Date();
-        List<TBasicWxChatStatistics> statisticsList = tBasicWxChatStatisticsDao.findStatisticsRankByDate(chatDate, gid);
-        List<TodayStatisticsRankDTO> statisticsRankDTOList = new ArrayList<>(statisticsList.size());
+        List<TodayStatisticsRankDTO> statisticsRankDTOList = tBasicWxChatStatisticsDao.findStatisticsRankByDate(chatDate, gid);
         // 查询群昵称
         int rankIndex = 1;
-        for (TBasicWxChatStatistics statistics : statisticsList) {
-            String groupUserName = wxGroupUserNameQueryService.queryGroupUserName(statistics.getGid(), statistics.getWxid());
-            TodayStatisticsRankDTO todayStatisticsRankDTO = new TodayStatisticsRankDTO();
+        for (TodayStatisticsRankDTO todayStatisticsRankDTO : statisticsRankDTOList) {
             todayStatisticsRankDTO.setRank(rankIndex);
-            todayStatisticsRankDTO.setUserGroupNickName(groupUserName);
-            todayStatisticsRankDTO.setChatNumber(statistics.getChatNum());
             rankIndex++;
-            statisticsRankDTOList.add(todayStatisticsRankDTO);
         }
         // 组装结果返回
         return statisticsRankDTOList;
@@ -115,10 +112,10 @@ public class GroupStatisticsServiceImpl implements GroupStatisticsService {
     public List<MonthNoTalkUserDTO> getMonthNoTalkUserList(String gid) {
         this.updateGroup(gid);
         Date chatDate = new Date();
-        List<TBasicWxChatStatistics> statisticsList = tBasicWxChatStatisticsDao.findMonthTalkUserList(chatDate, gid);
+        List<FindMonthTalkUserDTO> statisticsList = tBasicWxChatStatisticsDao.findMonthTalkUserList(chatDate, gid);
         List<TBasicWxUser> tBasicWxUsers = tBasicWxUserDao.findBy("gid", gid);
         List<TBasicWxUser> noTalkWxUserList = tBasicWxUsers.stream().filter(
-                user -> !statisticsList.stream().map(TBasicWxChatStatistics::getWxid).collect(Collectors.joining()).contains(user.getWxid()))
+                user -> !statisticsList.stream().map(FindMonthTalkUserDTO::getWxid).collect(Collectors.joining()).contains(user.getWxid()))
             .collect(Collectors.toList());
 
         List<MonthNoTalkUserDTO> statisticsRankDTOList = new ArrayList<>();

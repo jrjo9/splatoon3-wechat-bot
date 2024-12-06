@@ -5,26 +5,27 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap"
                type="com.mayday9.splatoonbot.business.entity.TBasicWxGroup">
-                <result column="id" property="id"/>
-                <result column="is_delete" property="isDelete"/>
-                <result column="create_by" property="createBy"/>
-                <result column="update_by" property="updateBy"/>
-                <result column="create_time" property="createTime"/>
-                <result column="update_time" property="updateTime"/>
-                    <result column="gid" property="gid"/>
-                    <result column="group_name" property="groupName"/>
-                    <result column="active_flag" property="activeFlag"/>
-        </resultMap>
+        <result column="id" property="id"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="gid" property="gid"/>
+        <result column="group_name" property="groupName"/>
+        <result column="active_flag" property="activeFlag"/>
+        <result column="auto_statistics_flag" property="autoStatisticsFlag"/>
+    </resultMap>
 
-            <!-- 通用查询结果列 -->
-            <sql id="Base_Column_List">
-                    id,
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
                     is_delete,
                     create_by,
                     update_by,
                     create_time,
                     update_time,
-                gid, group_name, active_flag
-            </sql>
+                gid, group_name, active_flag,auto_statistics_flag
+    </sql>
 
 </mapper>

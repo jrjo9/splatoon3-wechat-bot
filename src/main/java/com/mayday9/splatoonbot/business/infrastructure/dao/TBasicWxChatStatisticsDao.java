@@ -1,5 +1,7 @@
 package com.mayday9.splatoonbot.business.infrastructure.dao;
 
+import com.mayday9.splatoonbot.business.dto.statistics.FindMonthTalkUserDTO;
+import com.mayday9.splatoonbot.business.dto.statistics.TodayStatisticsRankDTO;
 import com.mayday9.splatoonbot.business.entity.TBasicWxChatStatistics;
 import com.mayday9.splatoonbot.common.db.dao.IBaseDao;
 import com.mayday9.splatoonbot.common.web.request.SearchDTO;
@@ -66,7 +68,7 @@ public interface TBasicWxChatStatisticsDao extends IBaseDao<TBasicWxChatStatisti
      * @param chatDate 日期
      * @return List<TBasicWxChatStatistics>
      */
-    List<TBasicWxChatStatistics> findStatisticsRankByDate(Date chatDate, String gid);
+    List<TodayStatisticsRankDTO> findStatisticsRankByDate(Date chatDate, String gid);
 
     /**
      * 查询当月未发言用户
@@ -74,7 +76,7 @@ public interface TBasicWxChatStatisticsDao extends IBaseDao<TBasicWxChatStatisti
      * @param chatDate 日期
      * @return List<TBasicWxChatStatistics>
      */
-    List<TBasicWxChatStatistics> findMonthTalkUserList(Date chatDate, String gid);
+    List<FindMonthTalkUserDTO> findMonthTalkUserList(Date chatDate, String gid);
 
     /**
      * 查询群组用户日期统计

@@ -1,6 +1,7 @@
 package com.mayday9.splatoonbot.business.service;
 
 import com.mayday9.splatoonbot.business.dto.basic.WxGroupRegisterDTO;
+import com.mayday9.splatoonbot.common.enums.FlagEnum;
 
 /**
  * @author Lianjiannan
@@ -15,5 +16,13 @@ public interface WxSystemService {
      * @return Boolean
      */
     void registerWxGroup(WxGroupRegisterDTO wxGroupRegisterDTO);
+
+    /**
+     * 转换群组自动统计开关
+     *
+     * @param gid 群组ID
+     * @return void
+     */
+    FlagEnum switchWxGroupAutoStatistics(String gid);
 
 }

@@ -42,5 +42,8 @@ public class TBasicWxGroup extends BaseEntity {
     @TableField("active_flag")
     private FlagEnum activeFlag;
 
+    @ApiModelProperty(value = "自动统计开关（1：开启，0：关闭）", required = true)
+    @TableField("auto_statistics_flag")
+    private FlagEnum autoStatisticsFlag;
 
 }

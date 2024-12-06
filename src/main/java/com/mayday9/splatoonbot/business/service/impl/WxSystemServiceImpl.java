@@ -11,6 +11,7 @@ import com.mayday9.splatoonbot.common.enums.FlagEnum;
 import com.mayday9.splatoonbot.common.web.response.ApiException;
 import com.mayday9.splatoonbot.common.web.response.ExceptionCode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -36,6 +37,7 @@ public class WxSystemServiceImpl implements WxSystemService {
      * @param wxGroupRegisterDTO DTO
      * @return Boolean
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void registerWxGroup(WxGroupRegisterDTO wxGroupRegisterDTO) {
         // 判断操作人是否管理员
@@ -52,6 +54,7 @@ public class WxSystemServiceImpl implements WxSystemService {
             tBasicWxGroup.setGid(wxGroupRegisterDTO.getGid());
             tBasicWxGroup.setGroupName(groupName);
             tBasicWxGroup.setActiveFlag(FlagEnum.YES);
+            tBasicWxGroup.setAutoStatisticsFlag(FlagEnum.NO);
             tBasicWxGroupDao.save(tBasicWxGroup);
         } else {
             if (FlagEnum.YES.equals(tBasicWxGroup.getActiveFlag())) {
@@ -60,6 +63,24 @@ public class WxSystemServiceImpl implements WxSystemService {
             tBasicWxGroup.setActiveFlag(FlagEnum.YES);
             tBasicWxGroupDao.updateById(tBasicWxGroup);
         }
+    }
+
+    /**
+     * 转换群组自动统计开关
+     *
+     * @param gid 群组ID
+     * @return void
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public FlagEnum switchWxGroupAutoStatistics(String gid) {
+        TBasicWxGroup tBasicWxGroup = tBasicWxGroupDao.findGroupByGid(gid);
+        if (tBasicWxGroup == null || FlagEnum.NO.equals(tBasicWxGroup.getActiveFlag())) {
+            throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "请先激活群组！");
+        }
+        tBasicWxGroup.setAutoStatisticsFlag(tBasicWxGroup.getAutoStatisticsFlag() == FlagEnum.YES ? FlagEnum.NO : FlagEnum.YES);
+        tBasicWxGroupDao.updateById(tBasicWxGroup);
+        return tBasicWxGroup.getAutoStatisticsFlag();
     }
 
 }

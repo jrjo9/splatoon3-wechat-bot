@@ -28,27 +28,23 @@
                 chat_date, gid, wxid, chat_num
     </sql>
 
-    <select id="findStatisticsRankByDate" resultMap="BaseResultMap">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM
-        t_basic_wx_chat_statistics
-        WHERE
-        chat_date = DATE_FORMAT(#{chatDate},'%Y-%m-%d')
-        and gid = #{gid}
-        ORDER BY
-        chat_num DESC
+    <select id="findStatisticsRankByDate" resultType="com.mayday9.splatoonbot.business.dto.statistics.TodayStatisticsRankDTO">
+        SELECT case when u.nickname is null or u.nickname = '' then u.username else u.nickname end userGroupNickName,
+               s.chat_num                                                                          chatNumber
+        FROM t_basic_wx_chat_statistics s
+                 left join t_basic_wx_user u on s.wxid = u.wxid and s.gid = u.gid
+        WHERE s.chat_date = DATE_FORMAT(#{chatDate}, '%Y-%m-%d')
+          and s.gid = #{gid}
+        ORDER BY s.chat_num DESC
         LIMIT 10
     </select>
 
-    <select id="findMonthTalkUserList" resultMap="BaseResultMap">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM
-        t_basic_wx_chat_statistics
-        WHERE
-        DATE_FORMAT(chat_date, '%m-%d') = DATE_FORMAT(#{chatDate}, '%m-%d')
-        and gid = #{gid}
+    <select id="findMonthTalkUserList" resultType="com.mayday9.splatoonbot.business.dto.statistics.FindMonthTalkUserDTO">
+        SELECT distinct gid,
+                        wxid
+        FROM t_basic_wx_chat_statistics
+        WHERE DATE_FORMAT(chat_date, '%y-%m') = DATE_FORMAT(#{chatDate}, '%y-%m')
+          and gid = #{gid}
     </select>
 
     <select id="findByGroupUserDate" resultMap="BaseResultMap">

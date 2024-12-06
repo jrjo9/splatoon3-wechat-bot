@@ -1,6 +1,7 @@
 package com.mayday9.splatoonbot.business.service.wxmsg.receive.basic;
 
 import com.mayday9.splatoonbot.business.service.GroupStatisticsService;
+import com.mayday9.splatoonbot.common.annotation.AuthWxMsg;
 import com.mayday9.splatoonbot.common.constant.WxMsgConstant;
 import com.mayday9.splatoonbot.common.dto.WechatMessage;
 import com.mayday9.splatoonbot.netty.annotation.WxMsgType;
@@ -23,6 +24,7 @@ public class StatisticsWxMsgService extends PaipaiWxMsgStrategy {
     private GroupStatisticsService groupStatisticsService;
 
     @Override
+    @AuthWxMsg
     public void doBusiness(WechatMessage wechatMessage) throws Exception {
         if (!wechatMessage.getWxid().contains("@chatroom")) {
             return;

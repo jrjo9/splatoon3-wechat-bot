@@ -13,7 +13,7 @@ import com.mayday9.splatoonbot.business.infrastructure.dao.TBasicSignInDao;
 import com.mayday9.splatoonbot.business.infrastructure.dao.TBasicWxGroupDao;
 import com.mayday9.splatoonbot.business.infrastructure.dao.TBasicWxUserDao;
 import com.mayday9.splatoonbot.business.service.SignInService;
-import com.mayday9.splatoonbot.business.service.wxmsg.query.WxGroupUserNameQueryService;
+import com.mayday9.splatoonbot.business.service.wxmsg.query.WxGroupUserNickNameQueryService;
 import com.mayday9.splatoonbot.business.service.wxmsg.query.WxUserInfoQueryService;
 import com.mayday9.splatoonbot.business.vo.WxUserSignInVO;
 import com.mayday9.splatoonbot.common.enums.FlagEnum;
@@ -38,7 +38,7 @@ public class SignInServiceImpl implements SignInService {
     private WxUserInfoQueryService wxUserInfoQueryService;
 
     @Resource
-    private WxGroupUserNameQueryService wxGroupUserNameQueryService;
+    private WxGroupUserNickNameQueryService wxGroupUserNickNameQueryService;
 
     @Resource
     private TBasicWxGroupDao tBasicWxGroupDao;
@@ -70,8 +70,7 @@ public class SignInServiceImpl implements SignInService {
             // 微信用户未存在，新增记录
             // 查联系人详细信息
             WxUserInfoQueryRespDTO wxUserInfoQueryRespDTO = wxUserInfoQueryService.queryUserInfo(wxUserSignInDTO.getWxid());
-            String nickName = wxGroupUserNameQueryService.queryGroupUserName(wxUserSignInDTO.getGid(), wxUserSignInDTO.getWxid());
-            TBasicWxUser wxUser = new TBasicWxUser(wxUserSignInDTO.getWxid(), wxUserInfoQueryRespDTO.getName(), wxUserSignInDTO.getGid(), nickName);
+            TBasicWxUser wxUser = new TBasicWxUser(wxUserSignInDTO.getWxid(), wxUserInfoQueryRespDTO.getName(), wxUserSignInDTO.getGid(), null);
             tBasicWxUserDao.save(wxUser);
             groupWxUserInfo = TBasicWxUserConvert.INSTANCE.convertDO(wxUser);
             groupWxUserInfo.setUserId(wxUser.getId());
@@ -102,7 +101,6 @@ public class SignInServiceImpl implements SignInService {
             throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "微信号：" + wxUserSignInDTO.getWxid() + "不存在！");
         }
         wxUser.setUsername(groupWxUserInfo.getUsername());
-        wxUser.setNickname(groupWxUserInfo.getNickname());
         wxUser.setSalmonEggs(wxUser.getSalmonEggs() != null ? wxUser.getSalmonEggs() + salmonEggs : salmonEggs);
         wxUser.setSignInDaysTotal(wxUser.getSignInDaysTotal() != null ? wxUser.getSignInDaysTotal() + 1 : 1);
         // 判断前一天是否有签到信息

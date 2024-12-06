@@ -13,7 +13,11 @@ CREATE TABLE `t_basic_wx_chat_statistics`
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4 COMMENT ='聊天统计表';
 
 ALTER TABLE `t_basic_wx_user`
     ADD COLUMN `nickname` varchar(200) NULL COMMENT '用户群昵称' AFTER `gid`;
+
+
+ALTER TABLE `t_basic_wx_group`
+    ADD COLUMN `auto_statistics_flag` char(1) NULL COMMENT '自动统计开关（1：开启，0：关闭）' AFTER `active_flag`;
