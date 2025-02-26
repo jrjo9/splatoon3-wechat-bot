@@ -13,6 +13,7 @@ public class CodeGenerator {
         Map<String, String> enumColumnMap = new HashMap<>();
         enumColumnMap.put("is_delete", "DeleteEnum");
         enumColumnMap.put("active_flag", "FlagEnum");
+        enumColumnMap.put("is_show", "FlagEnum");
 
         BaseCodeGenerator.setEnumColumnMap(enumColumnMap);
 //        BaseCodeGenerator.setModuleName("/");//多个module，需要指定modulename
@@ -34,7 +35,7 @@ public class CodeGenerator {
         defaultConfig.getStrategy().setEntityLombokModel(true);
         //需要生成的表，可指定多个，留空为全部生成
         defaultConfig.getStrategy().setInclude(
-            "t_basic_wx_chat_statistics"
+            "t_sys_param"
         );
         BaseCodeGenerator.generate(defaultConfig);
     }

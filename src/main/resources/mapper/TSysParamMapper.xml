@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mayday9.splatoonbot.business.infrastructure.mapper.TSysParamMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.mayday9.splatoonbot.business.entity.TSysParam">
+                <result column="id" property="id"/>
+                <result column="is_delete" property="isDelete"/>
+                <result column="create_by" property="createBy"/>
+                <result column="update_by" property="updateBy"/>
+                <result column="create_time" property="createTime"/>
+                <result column="update_time" property="updateTime"/>
+                    <result column="parent_id" property="parentId"/>
+                    <result column="param_code" property="paramCode"/>
+                    <result column="param_name" property="paramName"/>
+                    <result column="param_info" property="paramInfo"/>
+                    <result column="param_value" property="paramValue"/>
+                    <result column="param_group" property="paramGroup"/>
+                    <result column="sort_no" property="sortNo"/>
+                    <result column="need_encrypt" property="needEncrypt"/>
+                    <result column="is_show" property="isShow"/>
+        </resultMap>
+
+            <!-- 通用查询结果列 -->
+            <sql id="Base_Column_List">
+                    id,
+                    is_delete,
+                    create_by,
+                    update_by,
+                    create_time,
+                    update_time,
+                parent_id, param_code, param_name, param_info, param_value, param_group, sort_no, need_encrypt, is_show
+            </sql>
+
+</mapper>
