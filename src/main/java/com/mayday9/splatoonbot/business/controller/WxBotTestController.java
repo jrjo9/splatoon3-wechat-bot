@@ -41,7 +41,7 @@ public class WxBotTestController {
         wechatMessage.setSender(0);
         wechatMessage.setMsgID(28366);
         wechatMessage.setTime(DateUtil.current());
-        wechatMessage.setWxid("loveuxiao9");
+        wechatMessage.setWxid("loveuxiao92");
         wechatMessage.setTalker("");
         wechatMessage.setContent(wxBotTestDTO.getText());
         wechatMessage.setPath("");

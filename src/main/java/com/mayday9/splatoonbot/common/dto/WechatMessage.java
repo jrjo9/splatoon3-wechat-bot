@@ -16,6 +16,7 @@ import lombok.Setter;
 public class WechatMessage {
 
     // {"Type":1,"Sender":0,"MsgID":28366,"Time":1725955050,"Wxid":"7149208010@chatroom","Talker":"tin0101","Content":"碰上较真的真路人","Path":"","AtList":""}
+    // {"Type":1,"Sender":0,"MsgID":7623,"Time":1747293582,"Wxid":"loveuxiao9","Talker":"","Content":"你好","Path":"","AtList":""}
 
     // 类型
     @Alias(value = "Type")

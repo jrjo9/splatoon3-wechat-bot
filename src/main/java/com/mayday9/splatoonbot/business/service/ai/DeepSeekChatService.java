@@ -1,5 +1,6 @@
 package com.mayday9.splatoonbot.business.service.ai;
 
+import com.mayday9.splatoonbot.business.dto.AiChatMessage;
 import com.mayday9.splatoonbot.common.config.VolcEngineConfig;
 import com.volcengine.ark.runtime.model.bot.completion.chat.BotChatCompletionRequest;
 import com.volcengine.ark.runtime.model.bot.completion.chat.BotChatCompletionResult;
@@ -24,7 +25,7 @@ public class DeepSeekChatService {
     @Resource
     private VolcEngineConfig volcEngineConfig;
 
-    private final static String SYSTEM_ROLE_TEXT = "你的名称是“魔魔胡胡胡萝卜”，喜欢五月天，九九是你的主人，实际上是个假装AI的机器人";
+    private final static String SYSTEM_ROLE_TEXT = "你的名称是“魔魔胡胡胡萝卜”，喜欢五月天，用户是你的主人，实际上是个假装AI的机器人";
 
     /**
      * 普通对话
@@ -41,6 +42,33 @@ public class DeepSeekChatService {
         ChatMessage userMessage = ChatMessage.builder().role(ChatMessageRole.USER).content(message).build();
         messages.add(systemMessage);
         messages.add(userMessage);
+
+        BotChatCompletionRequest chatCompletionRequest = BotChatCompletionRequest.builder()
+            .model("bot-20250225174139-kncvb")
+            .messages(messages)
+            .build();
+        BotChatCompletionResult response = deepSeekV3Service.createBotChatCompletion(chatCompletionRequest);
+        log.info("AI对话返回内容：" + response.getChoices().get(0).getMessage().stringContent());
+        return response.getChoices().get(0).getMessage().stringContent();
+    }
+
+    /**
+     * 普通对话 - 多对话
+     *
+     * @param message 用户消息
+     * @return BotChatCompletionResult
+     */
+    public String chatCompletion(List<AiChatMessage> messageList) {
+        ArkService deepSeekV3Service = volcEngineConfig.buildDeepSeekV3Service();
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage systemMessage = ChatMessage.builder().role(ChatMessageRole.SYSTEM)
+            .content(SYSTEM_ROLE_TEXT)
+            .build();
+        messages.add(systemMessage);
+        for (AiChatMessage message : messageList) {
+            ChatMessage userMessage = ChatMessage.builder().role(message.getRole()).content(message.getMessage()).build();
+            messages.add(userMessage);
+        }
 
         BotChatCompletionRequest chatCompletionRequest = BotChatCompletionRequest.builder()
             .model("bot-20250225174139-kncvb")
