@@ -73,13 +73,11 @@ public class ChatWxMsgService extends PaipaiWxMsgStrategy {
 
         // 获取消息上下文
         List<AiChatMessage> aiChatMessageList;
-        boolean firstSession = false;
         if (redisUtil.hasKey(chatSessionKey)) {
             List<Object> chatMessageObjectList = redisUtil.range(chatSessionKey, 0, redisUtil.listLength(chatSessionKey));
             aiChatMessageList = chatMessageObjectList.stream().map(chatMessageObject -> JsonUtil.parse(chatMessageObject.toString(), AiChatMessage.class)).collect(Collectors.toList());
         } else {
             aiChatMessageList = new ArrayList<>();
-            firstSession = true;
         }
 
 
