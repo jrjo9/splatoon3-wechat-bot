@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>WebSocket 调试助手 · 仿微信聊天模块</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f4f8 0%, #e2e8f0 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        .card {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(0px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .header {
+            background: #1e293b;
+            padding: 1.2rem 2rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-weight: 600;
+            font-size: 1.65rem;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1::before {
+            content: "🔌";
+            font-size: 1.8rem;
+        }
+
+        .sub {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 6px;
+        }
+
+        .content {
+            padding: 2rem 2rem 1.8rem;
+        }
+
+        /* 配置区域 */
+        .config-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .input-group label {
+            width: 130px;
+            font-weight: 600;
+            color: #0f172a;
+            padding-top: 0.7rem;
+            font-size: 0.9rem;
+        }
+
+        .input-field {
+            flex: 1;
+            min-width: 240px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            transition: 0.2s;
+            background: white;
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        input:disabled, textarea:disabled {
+            background: #f1f5f9;
+            color: #475569;
+            border-color: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        textarea {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            resize: vertical;
+            min-height: 85px;
+        }
+
+        .param-hint, .heartbeat-hint, .wxid-hint {
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-top: 4px;
+            margin-left: 0.2rem;
+        }
+
+        /* 操作栏 */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: #f8fafc;
+            padding: 1rem 1.2rem;
+            border-radius: 1.5rem;
+            border: 1px solid #e2edff;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #94a3b8;
+            transition: all 0.2s;
+        }
+
+        .led.connected {
+            background-color: #22c55e;
+            box-shadow: 0 0 6px #22c55e;
+        }
+
+        .status-text {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #1e293b;
+        }
+
+        .btn {
+            border: none;
+            background: #3b82f6;
+            color: white;
+            padding: 0.6rem 1.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+        }
+        .btn-danger:hover:not(:disabled) {
+            background: #dc2626;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* ---------- 仿微信聊天模块 ---------- */
+        .chat-section {
+            margin: 1.5rem 0 1.8rem;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eef2ff;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #f7f9fc;
+            padding: 0.9rem 1.5rem;
+            border-bottom: 1px solid #e9edf2;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .chat-header span {
+            font-size: 0.7rem;
+            background: #e2e8f0;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            color: #334155;
+        }
+
+        .chat-messages {
+            height: 380px;
+            overflow-y: auto;
+            padding: 1rem 1.2rem;
+            background: #fefefe;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* 气泡样式 */
+        .message-bubble {
+            display: flex;
+            max-width: 80%;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .message-left {
+            align-self: flex-start;
+        }
+
+        .message-right {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .bubble-content {
+            background: #e4e6eb;
+            padding: 0.55rem 1rem;
+            border-radius: 1.2rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            word-break: break-word;
+            color: #1e1f22;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.05);
+        }
+
+        .message-right .bubble-content {
+            background: #dcf8c5;
+        }
+
+        .message-meta {
+            font-size: 0.65rem;
+            color: #8e8e93;
+            margin-top: 4px;
+            margin-bottom: 2px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 12px;
+            padding: 1rem 1.2rem;
+            background: #f9fafb;
+            border-top: 1px solid #eef2f0;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            border-radius: 2rem;
+            padding: 0.7rem 1.2rem;
+            border: 1px solid #e2e8f0;
+            font-family: inherit;
+            background: white;
+        }
+
+        .chat-input-area input:focus {
+            border-color: #3b82f6;
+        }
+
+        .chat-input-area button {
+            background: #3b82f6;
+            border: none;
+            color: white;
+            padding: 0 1.5rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .chat-input-area button:hover:not(:disabled) {
+            background: #2563eb;
+        }
+
+        .chat-input-area button:disabled, .chat-input-area input:disabled {
+            background-color: #f1f5f9;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* 日志区域 */
+        .log-section {
+            margin-top: 0.8rem;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .log-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .clear-log {
+            background: none;
+            border: 1px solid #cbd5e1;
+            padding: 0.2rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+        }
+
+        .log-container {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 1.2rem;
+            padding: 0.8rem;
+            height: 250px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .log-entry {
+            border-bottom: 1px solid #1e293b;
+            padding: 0.4rem 0.3rem;
+            white-space: pre-wrap;
+        }
+
+        .log-time {
+            color: #5ee0fa;
+            margin-right: 12px;
+        }
+
+        .log-direction.send { color: #86efac; }
+        .log-direction.recv { color: #facc15; }
+        .log-direction.error { color: #f87171; }
+        .log-direction.info { color: #93c5fd; }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 1rem;
+            border-top: 1px solid #eef2ff;
+            color: #5b6e8c;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>WebSocket 调试助手 · 仿微信聊天</h1>
+        <div class="sub">自动UUID · 可配心跳 · 聊天消息自动转JSON | 服务器消息直显</div>
+    </div>
+    <div class="content">
+        <!-- 配置区域 -->
+        <div class="config-grid">
+            <div class="input-group">
+                <label>📡 WebSocket URL</label>
+                <div class="input-field"><input type="text" id="wsUrl" placeholder="ws://localhost:8080/ws" value="ws://127.0.0.1:3910/ws"></div>
+            </div>
+            <div class="input-group">
+                <label>📝 method</label>
+                <div class="input-field"><input type="text" id="method" placeholder="例如: chat, message" value="chat"></div>
+            </div>
+            <div class="input-group">
+                <label>⚙️ param (通用/心跳)</label>
+                <div class="input-field">
+                    <textarea id="paramJson" placeholder='{"type":"init","data":"hello"}'>{"greeting":"hello server"}</textarea>
+                    <div class="param-hint">连接首次消息 & 心跳使用的param (聊天消息将忽略此内容)</div>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>❤️ 心跳间隔 (秒)</label>
+                <div class="input-field"><input type="number" id="heartbeatIntervalSec" min="1" max="300" step="1" value="30"></div>
+            </div>
+            <div class="input-group">
+                <label>🆔 微信ID (Wxid)</label>
+                <div class="input-field">
+                    <input type="text" id="wxidInput" placeholder="自己的微信标识" value="loveuxiao9">
+                    <div class="wxid-hint">聊天消息中的 Wxid 字段值</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作栏 -->
+        <div class="action-bar">
+            <div class="status-badge">
+                <span class="led" id="statusLed"></span>
+                <span class="status-text" id="statusText">未连接</span>
+                <span id="sessionIdBadge" style="font-size:0.7rem; color:#475569; margin-left:8px;"></span>
+            </div>
+            <button class="btn" id="connectBtn">🔌 连接</button>
+        </div>
+
+        <!-- ★ 仿微信聊天模块 -->
+        <div class="chat-section">
+            <div class="chat-header">
+                <h3>💬 仿微信聊天</h3>
+                <span>连接后自动启用</span>
+            </div>
+            <div class="chat-messages" id="chatMessagesArea">
+                <div class="message-bubble message-left"><div class="bubble-content">⚡ 连接 WebSocket 后即可发送聊天消息，服务器返回内容会显示在此处。</div></div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="输入消息..." autocomplete="off">
+                <button id="sendChatBtn">发送</button>
+            </div>
+        </div>
+
+        <!-- 通讯日志区 -->
+        <div class="log-section">
+            <div class="log-header">
+                <h3>📋 通讯日志 (原始报文)</h3>
+                <button class="clear-log" id="clearLogBtn">清空日志</button>
+            </div>
+            <div class="log-container" id="logContainer">
+                <div class="log-entry info"><span class="log-time">[就绪]</span> ℹ️ 配置完成后点击「连接」, 聊天消息自动转换为指定JSON格式并发送</div>
+            </div>
+        </div>
+    </div>
+    <footer>✨ 连接后自动发送首次消息(使用通用param) + 心跳(可配) | 聊天消息使用微信结构(自动生成MsgID/时间戳) | 接收消息直显</footer>
+</div>
+
+<script>
+    // ---------- DOM 元素 ----------
+    const wsUrlInput = document.getElementById('wsUrl');
+    const methodInput = document.getElementById('method');
+    const paramTextarea = document.getElementById('paramJson');
+    const heartbeatIntervalSecInput = document.getElementById('heartbeatIntervalSec');
+    const wxidInput = document.getElementById('wxidInput');
+    const connectBtn = document.getElementById('connectBtn');
+    const statusLed = document.getElementById('statusLed');
+    const statusTextSpan = document.getElementById('statusText');
+    const sessionIdBadge = document.getElementById('sessionIdBadge');
+    const logContainer = document.getElementById('logContainer');
+    const clearLogBtn = document.getElementById('clearLogBtn');
+    // 聊天DOM
+    const chatMessagesArea = document.getElementById('chatMessagesArea');
+    const chatInput = document.getElementById('chatInput');
+    const sendChatBtn = document.getElementById('sendChatBtn');
+
+    // ---------- 全局状态 ----------
+    let webSocket = null;
+    let heartbeatTimer = null;
+    let currentSessionId = null;
+    let cachedMethod = '';
+    let cachedParamObj = {};      // 通用param (用于首次及心跳)
+    let cachedHeartbeatSec = 30;
+    let isConnected = false;
+
+    // 自增MsgID种子 (确保唯一，时间戳+序号)
+    let lastMsgId = Math.floor(Date.now() / 10) % 1000000;
+
+    // ---------- 辅助函数 ----------
+    function generateUUID() {
+        if (window.crypto && window.crypto.randomUUID) return crypto.randomUUID();
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+    // 获取当前Unix时间戳(秒)
+    function getUnixTimestampSec() {
+        return Math.floor(Date.now() / 1000);
+    }
+
+    // 生成自增MsgID
+    function generateMsgId() {
+        lastMsgId = (lastMsgId + 1) % 100000000;
+        return lastMsgId;
+    }
+
+    // 聊天消息添加至UI (direction: 'send' 发送方(右), 'recv' 接收方(左))
+    function appendChatMessage(content, direction, extraInfo = '') {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message-bubble ${direction === 'send' ? 'message-right' : 'message-left'}`;
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble-content';
+        bubble.innerText = content;
+        msgDiv.appendChild(bubble);
+        // 附加小时间戳
+        const timeSpan = document.createElement('div');
+        timeSpan.className = 'message-meta';
+        timeSpan.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
+        if (direction === 'send') msgDiv.appendChild(timeSpan);
+        else msgDiv.appendChild(timeSpan);
+        chatMessagesArea.appendChild(msgDiv);
+        msgDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // 清空聊天区域(保留默认提示)
+    function clearChatArea() {
+        chatMessagesArea.innerHTML = '';
+        appendChatMessage('连接 WebSocket 后即可发送聊天消息，服务器返回内容会显示在此处。', 'recv');
+    }
+
+    // 日志
+    function addLog(message, type = 'info') {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false });
+        const logDiv = document.createElement('div');
+        logDiv.className = `log-entry ${type}`;
+        let icon = '';
+        if (type === 'send') icon = '📤 ';
+        else if (type === 'recv') icon = '📥 ';
+        else if (type === 'error') icon = '⚠️ ';
+        else icon = 'ℹ️ ';
+        logDiv.innerHTML = `<span class="log-time">[${timeStr}]</span> ${icon}<span>${escapeHtml(message)}</span>`;
+        logContainer.appendChild(logDiv);
+        logDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
+    }
+
+    // UI连接/断开样式&编辑锁
+    function updateUIForConnected(connected) {
+        isConnected = connected;
+        const editableFields = [wsUrlInput, methodInput, paramTextarea, heartbeatIntervalSecInput, wxidInput];
+        editableFields.forEach(field => field.disabled = connected);
+        if (connected) {
+            connectBtn.textContent = '🔌 断开连接';
+            connectBtn.classList.add('btn-danger');
+            connectBtn.classList.remove('btn');
+            statusLed.classList.add('connected');
+            statusTextSpan.textContent = '已连接';
+            sessionIdBadge.textContent = currentSessionId ? `会话: ${currentSessionId.substring(0, 8)}...` : '';
+            // 启用聊天控件
+            chatInput.disabled = false;
+            sendChatBtn.disabled = false;
+        } else {
+            connectBtn.textContent = '🔌 连接';
+            connectBtn.classList.remove('btn-danger');
+            connectBtn.classList.add('btn');
+            statusLed.classList.remove('connected');
+            statusTextSpan.textContent = '未连接';
+            sessionIdBadge.textContent = '';
+            // 禁用聊天控件并清空输入
+            chatInput.disabled = true;
+            sendChatBtn.disabled = true;
+            chatInput.value = '';
+            currentSessionId = null;
+        }
+    }
+
+    // 停止心跳
+    function stopHeartbeat() {
+        if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+    }
+
+    // 核心发送 (外层消息)
+    function sendWsMessage(method, sessionId, paramObj, heartbeatFlag) {
+        if (!webSocket || webSocket.readyState !== WebSocket.OPEN) {
+            addLog(`发送失败: WebSocket未打开`, 'error');
+            return false;
+        }
+        const payload = { method, sessionId, param: paramObj, heartbeat: heartbeatFlag };
+        const jsonStr = JSON.stringify(payload);
+        try {
+            webSocket.send(jsonStr);
+            addLog(`发送 → ${jsonStr}`, 'send');
+            return true;
+        } catch (err) {
+            addLog(`发送异常: ${err.message}`, 'error');
+            return false;
+        }
+    }
+
+    // 发送首次连接消息(通用param)
+    function sendFirstMessage() {
+        if (!webSocket || webSocket.readyState !== WebSocket.OPEN) return false;
+        if (!currentSessionId || !cachedMethod) return false;
+        return sendWsMessage(cachedMethod, currentSessionId, cachedParamObj, false);
+    }
+
+    // 心跳
+    function sendHeartbeat() {
+        if (!isConnected || !webSocket || webSocket.readyState !== WebSocket.OPEN) {
+            if (webSocket?.readyState !== WebSocket.OPEN) stopHeartbeat();
+            return;
+        }
+        sendWsMessage(cachedMethod, currentSessionId, cachedParamObj, true);
+    }
+
+    function startHeartbeat() {
+        stopHeartbeat();
+        if (!cachedHeartbeatSec || cachedHeartbeatSec < 1) cachedHeartbeatSec = 30;
+        heartbeatTimer = setInterval(() => sendHeartbeat(), cachedHeartbeatSec * 1000);
+        addLog(`心跳已启动 (间隔 ${cachedHeartbeatSec} 秒, heartbeat=true)`, 'info');
+    }
+
+    // ************ 仿微信聊天发送 ************
+    // 构建聊天专用的param (微信消息结构)
+    function buildChatParam(contentText) {
+        const wxid = wxidInput.value.trim() || "loveuxiao9";
+        const currentTimeSec = getUnixTimestampSec();
+        const msgId = generateMsgId();
+        const chatMsg = {
+            Type: 1,
+            Sender: 0,
+            MsgID: msgId,
+            Time: currentTimeSec,
+            Wxid: wxid,
+            Talker: "",
+            Content: contentText,
+            Path: "",
+            AtList: ""
+        };
+        return chatMsg;
+    }
+
+    // 发送聊天消息（由用户点击调用）
+    function sendChatMessage() {
+        if (!isConnected) {
+            addLog("未连接WebSocket，无法发送聊天消息", "error");
+            appendChatMessage("未连接服务器，发送失败", "recv");
+            return;
+        }
+        const text = chatInput.value.trim();
+        if (!text) return;
+        // 构建聊天专用param
+        const chatParam = buildChatParam(text);
+        // 发送外层消息: method使用配置的method, sessionId当前有效, param为chatMsg结构, heartbeat=false
+        const success = sendWsMessage(cachedMethod, currentSessionId, chatParam, false);
+        if (success) {
+            // 本地展示发送的消息 (仿微信自己右侧)
+            appendChatMessage(text, 'send');
+            chatInput.value = '';
+        } else {
+            appendChatMessage("发送失败: 连接异常", "recv");
+        }
+    }
+
+    // 处理接收到的服务器消息，展示在聊天模块 (直接展示原始字符串)
+    function handleReceivedMessageForChat(rawData) {
+        let displayText = rawData;
+        // 若为JSON，尝试美化显示但仅展示字符串内容
+        try {
+            const parsed = JSON.parse(rawData);
+            displayText = JSON.stringify(parsed, null, 2);
+        } catch(e) { /* 保持原文本 */ }
+        appendChatMessage(displayText, 'recv');
+    }
+
+    // 清理连接 & 内部重置
+    function closeWebSocketAndCleanup(resetUIFlag = true) {
+        stopHeartbeat();
+        if (webSocket) {
+            if (webSocket.readyState === WebSocket.OPEN || webSocket.readyState === WebSocket.CONNECTING) {
+                webSocket.close();
+            }
+            webSocket = null;
+        }
+        if (resetUIFlag) {
+            updateUIForConnected(false);
+        }
+        currentSessionId = null;
+        cachedMethod = '';
+        cachedParamObj = {};
+        cachedHeartbeatSec = 30;
+        addLog("连接已关闭，配置恢复可编辑", "info");
+    }
+
+    // 参数校验 & 连接
+    function validateAndGetParamObj() {
+        const raw = paramTextarea.value.trim();
+        if (!raw) return {};
+        try {
+            const parsed = JSON.parse(raw);
+            return (parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {};
+        } catch(e) {
+            addLog(`通用param JSON无效: ${e.message}, 将使用空对象`, "error");
+            return {};
+        }
+    }
+
+    function getValidHeartbeatSeconds() {
+        let val = heartbeatIntervalSecInput.value.trim();
+        let sec = parseInt(val, 10);
+        if (isNaN(sec) || sec < 1) return 30;
+        return Math.min(sec, 300);
+    }
+
+    async function connectWebSocket() {
+        const wsUrl = wsUrlInput.value.trim();
+        if (!wsUrl || (!wsUrl.startsWith('ws://') && !wsUrl.startsWith('wss://'))) {
+            addLog("请填写有效的 ws:// 或 wss:// 地址", "error");
+            return false;
+        }
+        const methodVal = methodInput.value.trim();
+        if (!methodVal) { addLog("method不能为空", "error"); return false; }
+        const paramObj = validateAndGetParamObj();
+        const heartbeatSec = getValidHeartbeatSeconds();
+        
+        // 若已有连接则先断开
+        if (webSocket && (webSocket.readyState === WebSocket.OPEN || webSocket.readyState === WebSocket.CONNECTING)) {
+            closeWebSocketAndCleanup(true);
+        }
+        const newSessionId = generateUUID();
+        currentSessionId = newSessionId;
+        cachedMethod = methodVal;
+        cachedParamObj = paramObj;
+        cachedHeartbeatSec = heartbeatSec;
+
+        try {
+            webSocket = new WebSocket(wsUrl);
+        } catch(err) {
+            addLog(`创建WebSocket失败: ${err.message}`, "error");
+            closeWebSocketAndCleanup(true);
+            return false;
+        }
+
+        webSocket.onopen = () => {
+            addLog(`✅ 已连接到 ${wsUrl}`, "info");
+            updateUIForConnected(true);
+            // 清空聊天旧消息, 添加系统提示
+            clearChatArea();
+            appendChatMessage("连接已建立，现在可以发送微信格式消息", 'recv');
+            // 发送首次消息(通用)
+            sendFirstMessage();
+            startHeartbeat();
+        };
+
+        webSocket.onmessage = (event) => {
+            let received = event.data;
+            let displayRaw = received;
+            // 尝试解析一下用于日志显示
+            try {
+                const jsonParsed = JSON.parse(received);
+                displayRaw = JSON.stringify(jsonParsed, null, 2);
+                addLog(`接收 ← ${displayRaw}`, 'recv');
+            } catch(e) {
+                addLog(`接收 ← ${received}`, 'recv');
+            }
+            // ★ 聊天模块直接显示服务器返回的原始字符串
+            handleReceivedMessageForChat(received);
+        };
+
+        webSocket.onerror = (err) => {
+            addLog(`WebSocket错误`, "error");
+            if (isConnected) closeWebSocketAndCleanup(true);
+            else closeWebSocketAndCleanup(true);
+        };
+
+        webSocket.onclose = (event) => {
+            addLog(`连接关闭 code=${event.code} reason=${event.reason || '无'}`, "info");
+            closeWebSocketAndCleanup(true);
+            appendChatMessage("连接已断开", 'recv');
+        };
+        return true;
+    }
+
+    function disconnectWebSocket() {
+        if (webSocket) {
+            stopHeartbeat();
+            if (webSocket.readyState === WebSocket.OPEN) webSocket.close();
+            webSocket = null;
+        }
+        updateUIForConnected(false);
+        currentSessionId = null;
+        cachedParamObj = {};
+        addLog("主动断开连接", "info");
+        clearChatArea();
+        appendChatMessage("连接已断开，请重新连接", 'recv');
+    }
+
+    // 按钮切换
+    function onConnectToggle() {
+        if (isConnected) disconnectWebSocket();
+        else connectWebSocket().catch(e => { addLog(`连接异常: ${e.message}`, "error"); closeWebSocketAndCleanup(true); });
+    }
+
+    // 事件绑定
+    connectBtn.addEventListener('click', onConnectToggle);
+    sendChatBtn.addEventListener('click', sendChatMessage);
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
+    clearLogBtn.addEventListener('click', () => { logContainer.innerHTML = ''; addLog("日志已清空", "info"); });
+
+    // 初始化
+    updateUIForConnected(false);
+    chatInput.disabled = true;
+    sendChatBtn.disabled = true;
+    paramTextarea.value = '{}';
+    wxidInput.value = "loveuxiao9";
+    addLog("✨ 就绪 | 配置好WebSocket地址后点击连接，聊天消息将自动转为<chat-msg>格式(param内)", "info");
+</script>
+</body>
+</html>

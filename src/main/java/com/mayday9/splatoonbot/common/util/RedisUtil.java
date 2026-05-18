@@ -52,6 +52,16 @@ public class RedisUtil {
         return redisTemplate.boundValueOps(key).persist();
     }
 
+    /**
+     * 删除指定key
+     *
+     * @param key 键
+     * @return true成功 false失败
+     */
+    public boolean deleteKey(String key) {
+        return redisTemplate.delete(key);
+    }
+
     //- - - - - - - - - - - - - - - - - - - - -  String类型 - - - - - - - - - - - - - - - - - - - -
 
     /**

@@ -18,16 +18,16 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class VolcEngineConfig {
 
-    @Value("${volcEngine.deepseek-v3.apiKey}")
-    private String deepSeekV3ApiKey;
+    @Value("${volcEngine.apiKey}")
+    private String apiKey;
 
     @Bean
-    public ArkService buildDeepSeekV3Service() {
-        log.debug("init volcengine deepseek v3 service...");
+    public ArkService buildService() {
+        log.debug("init volcengine deepseek service...");
         return ArkService.builder().dispatcher(new Dispatcher())
             .connectionPool(new ConnectionPool(5, 1, TimeUnit.SECONDS))
             .baseUrl("https://ark.cn-beijing.volces.com/api/v3")
-            .apiKey(deepSeekV3ApiKey)
+                .apiKey(apiKey)
             .build();
     }
 }

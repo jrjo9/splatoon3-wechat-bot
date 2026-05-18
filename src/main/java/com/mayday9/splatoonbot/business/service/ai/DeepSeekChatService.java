@@ -4,8 +4,7 @@ import com.mayday9.splatoonbot.business.dto.AiChatMessage;
 import com.mayday9.splatoonbot.common.config.VolcEngineConfig;
 import com.volcengine.ark.runtime.model.bot.completion.chat.BotChatCompletionRequest;
 import com.volcengine.ark.runtime.model.bot.completion.chat.BotChatCompletionResult;
-import com.volcengine.ark.runtime.model.completion.chat.ChatMessage;
-import com.volcengine.ark.runtime.model.completion.chat.ChatMessageRole;
+import com.volcengine.ark.runtime.model.completion.chat.*;
 import com.volcengine.ark.runtime.service.ArkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,7 +33,7 @@ public class DeepSeekChatService {
      * @return BotChatCompletionResult
      */
     public String chatCompletion(String message) {
-        ArkService deepSeekV3Service = volcEngineConfig.buildDeepSeekV3Service();
+        ArkService service = volcEngineConfig.buildService();
         List<ChatMessage> messages = new ArrayList<>();
         ChatMessage systemMessage = ChatMessage.builder().role(ChatMessageRole.SYSTEM)
             .content(SYSTEM_ROLE_TEXT)
@@ -43,11 +42,12 @@ public class DeepSeekChatService {
         messages.add(systemMessage);
         messages.add(userMessage);
 
-        BotChatCompletionRequest chatCompletionRequest = BotChatCompletionRequest.builder()
-            .model("bot-20250225174139-kncvb")
-            .messages(messages)
-            .build();
-        BotChatCompletionResult response = deepSeekV3Service.createBotChatCompletion(chatCompletionRequest);
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                // 指定您创建的方舟推理接入点 ID，此处已帮您修改为您的推理接入点 ID
+                .model("doubao-seed-2-0-lite-260428")
+                .messages(messages)
+                .build();
+        ChatCompletionResult response = service.createChatCompletion(chatCompletionRequest);
         log.info("AI对话返回内容：" + response.getChoices().get(0).getMessage().stringContent());
         return response.getChoices().get(0).getMessage().stringContent();
     }
@@ -59,7 +59,7 @@ public class DeepSeekChatService {
      * @return BotChatCompletionResult
      */
     public String chatCompletion(List<AiChatMessage> messageList) {
-        ArkService deepSeekV3Service = volcEngineConfig.buildDeepSeekV3Service();
+        ArkService service = volcEngineConfig.buildService();
         List<ChatMessage> messages = new ArrayList<>();
         ChatMessage systemMessage = ChatMessage.builder().role(ChatMessageRole.SYSTEM)
             .content(SYSTEM_ROLE_TEXT)
@@ -70,11 +70,12 @@ public class DeepSeekChatService {
             messages.add(userMessage);
         }
 
-        BotChatCompletionRequest chatCompletionRequest = BotChatCompletionRequest.builder()
-            .model("bot-20250225174139-kncvb")
-            .messages(messages)
-            .build();
-        BotChatCompletionResult response = deepSeekV3Service.createBotChatCompletion(chatCompletionRequest);
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                // 指定您创建的方舟推理接入点 ID，此处已帮您修改为您的推理接入点 ID
+                .model("doubao-seed-2-0-lite-260428")
+                .messages(messages)
+                .build();
+        ChatCompletionResult response = service.createChatCompletion(chatCompletionRequest);
         log.info("AI对话返回内容：" + response.getChoices().get(0).getMessage().stringContent());
         return response.getChoices().get(0).getMessage().stringContent();
     }

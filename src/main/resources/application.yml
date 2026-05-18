@@ -31,3 +31,10 @@ mybatis-plus:
       db-type: MYSQL
   mapper-locations: classpath*:/mapper/*.xml
   type-enums-package: com.mayday9.splatoonbot.common.enums
+
+websocket:
+  enabled: true
+  port: 3910
+  heartbeatInterval: 60
+  heartbeatTimeout: 60
+  maxConnections: 1000
