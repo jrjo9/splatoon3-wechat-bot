@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 /**
@@ -27,9 +28,31 @@ public class TSysParamServiceImpl implements TSysParamService {
         return tSysParamDao.findOneBy("paramCode", paramCode);
     }
 
+    @PostConstruct
+    public void clearCacheOnStartup() {
+        flushCache();
+        log.info("应用启动，清理参数表缓存");
+    }
+
     @Override
     @CacheEvict(cacheNames = "tSysParam", allEntries = true)
     public void flushCache() {
         log.info("------------ 刷新参数表缓存 --------------");
+    }
+
+    @Override
+    @CacheEvict(cacheNames = "tSysParam", allEntries = true)
+    public boolean updateParamValue(String paramCode, String paramValue) {
+        TSysParam tSysParam = findByCode(paramCode);
+        if (tSysParam == null) {
+            log.warn("未找到参数: {}", paramCode);
+            return false;
+        }
+        tSysParam.setParamValue(paramValue);
+        boolean result = tSysParamDao.edit(tSysParam);
+        if (result) {
+            log.info("更新参数 {} = {}", paramCode, paramValue);
+        }
+        return result;
     }
 }

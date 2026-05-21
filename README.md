@@ -3,7 +3,7 @@
 ### 1.1 微信Hook框架
 
 采用“派派WeChat”框架监听微信消息。
-官网：https://a.paipai.chat/
+官网：https://a.paipai.chat/（网站已停止）
 
 ### 1.2 数据来源
 
@@ -73,3 +73,12 @@ https://apifox.com/apidoc/shared-395e4165-fcc7-4e8a-959a-a9e46521a890
 ### V1.2版本
 
 - 帮助功能
+
+### V2.0版本
+
+- 接入DEEPSEEK3.2
+
+### V2.1版本
+
+- DEEPSEEK模型换豆包lite
+- 成语接龙

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -678,6 +679,8 @@ public class JsonUtil {
             super.configure(JsonReadFeature.ALLOW_SINGLE_QUOTES.mappedFeature(), true);
             //反序列化时，属性不存在的兼容处理s
             super.getDeserializationConfig().withoutFeatures(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            // 忽略大小写，兼容 content/Content 两种格式
+            super.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
             //日期格式化
             super.registerModule(new BladeJavaTimeModule());
             super.findAndRegisterModules();

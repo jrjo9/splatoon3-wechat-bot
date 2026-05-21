@@ -4,7 +4,7 @@ import com.mayday9.splatoonbot.business.dto.AiChatMessage;
 import com.mayday9.splatoonbot.business.entity.TSysParam;
 import com.mayday9.splatoonbot.business.service.TSysParamService;
 import com.mayday9.splatoonbot.business.service.ai.BaiduChatService;
-import com.mayday9.splatoonbot.business.service.ai.DeepSeekChatService;
+import com.mayday9.splatoonbot.business.service.ai.ArkChatService;
 import com.mayday9.splatoonbot.business.service.wxmsg.send.TextWxMsgSender;
 import com.mayday9.splatoonbot.common.annotation.AuthWxMsg;
 import com.mayday9.splatoonbot.common.constant.AiChatModelConstant;
@@ -39,7 +39,7 @@ public class ChatWxMsgService extends PaipaiWxMsgStrategy {
     private BaiduChatService baiduChatService;
 
     @Resource
-    private DeepSeekChatService deepSeekChatService;
+    private ArkChatService arkChatService;
 
     @Resource
     private TextWxMsgSender textWxMsgSender;
@@ -100,8 +100,8 @@ public class ChatWxMsgService extends PaipaiWxMsgStrategy {
             case AiChatModelConstant.ERNIE_SPEED_8K:
                 content = baiduChatService.chatCompletion(message);
                 break;
-            case AiChatModelConstant.DEEP_SEEK_V3:
-                content = deepSeekChatService.chatCompletion(aiChatMessageList);
+            case AiChatModelConstant.ARK:
+                content = arkChatService.chatCompletion(aiChatMessageList);
                 break;
             default:
                 content = "未配置大模型，请联系管理员！";

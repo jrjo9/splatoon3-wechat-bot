@@ -1,5 +1,6 @@
 package com.mayday9.splatoonbot.netty.strategy;
 
+import com.mayday9.splatoonbot.common.web.response.ApiException;
 import com.mayday9.splatoonbot.netty.manager.TextMessage;
 import com.mayday9.splatoonbot.netty.model.WebSocketMessage;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,6 +13,9 @@ public abstract class AbstractWebSocketStrategy implements WebSocketStrategy {
     public void handle(ChannelHandlerContext ctx, WebSocketMessage message) {
         try {
             doBusiness(ctx, message);
+        } catch (ApiException e) {
+            log.warn("WebSocket业务异常: {}", e.getMessage());
+            sendTextMessage(ctx, e.getMessage());
         } catch (Exception e) {
             log.error("WebSocket策略处理异常", e);
             sendTextMessage(ctx, "抱歉，服务暂时不可用，请稍后再试。");

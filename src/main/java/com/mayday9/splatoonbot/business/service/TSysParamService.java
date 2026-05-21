@@ -22,4 +22,14 @@ public interface TSysParamService {
      *
      */
     void flushCache();
+
+
+    /**
+     * 根据参数编码更新参数值
+     *
+     * @param paramCode  参数编码
+     * @param paramValue 参数值
+     * @return 是否更新成功
+     */
+    boolean updateParamValue(String paramCode, String paramValue);
 }

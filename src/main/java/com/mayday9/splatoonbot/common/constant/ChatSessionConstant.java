@@ -10,4 +10,6 @@ public class ChatSessionConstant {
 
     public final static String CHAT_SESSION_USER = "chatSession:user:id:";
 
+    public final static String IDIOM_GAME_STATE = "idiom:game:state:";
+
 }

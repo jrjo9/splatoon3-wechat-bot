@@ -2,8 +2,6 @@ package com.mayday9.splatoonbot.business.service.ai;
 
 import com.mayday9.splatoonbot.business.dto.AiChatMessage;
 import com.mayday9.splatoonbot.common.config.VolcEngineConfig;
-import com.volcengine.ark.runtime.model.bot.completion.chat.BotChatCompletionRequest;
-import com.volcengine.ark.runtime.model.bot.completion.chat.BotChatCompletionResult;
 import com.volcengine.ark.runtime.model.completion.chat.*;
 import com.volcengine.ark.runtime.service.ArkService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +17,7 @@ import java.util.List;
  **/
 @Slf4j
 @Component
-public class DeepSeekChatService {
+public class ArkChatService {
 
     @Resource
     private VolcEngineConfig volcEngineConfig;
