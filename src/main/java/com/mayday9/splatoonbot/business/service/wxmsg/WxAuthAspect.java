@@ -1,5 +1,6 @@
 package com.mayday9.splatoonbot.business.service.wxmsg;
 
+import com.alibaba.druid.util.StringUtils;
 import com.mayday9.splatoonbot.business.entity.TBasicWxGroup;
 import com.mayday9.splatoonbot.business.infrastructure.dao.TBasicWxGroupDao;
 import com.mayday9.splatoonbot.business.service.wxmsg.send.TextWxMsgSender;
@@ -33,6 +34,10 @@ public class WxAuthAspect {
         if (joinPoint.getArgs()[0] instanceof WechatMessage) {
             WechatMessage wechatMessage = (WechatMessage) joinPoint.getArgs()[0];
             if (wechatMessage.getWxid().contains("@chatroom")) {
+                // 检查是否略过或私聊（私聊Talker为空，不检查）
+                if (wechatMessage.isSkipped() || StringUtils.isEmpty(wechatMessage.getTalker())) {
+                    return;
+                }
                 // 判断该微信组是否激活
                 TBasicWxGroup wxGroup = tBasicWxGroupDao.findGroupByGid(wechatMessage.getWxid());
                 if (wxGroup == null || FlagEnum.NO.equals(wxGroup.getActiveFlag())) {

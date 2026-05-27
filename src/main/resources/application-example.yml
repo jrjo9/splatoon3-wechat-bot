@@ -12,20 +12,44 @@ spring:
       min-idle: 5
       max-active: 100
   redis:
-    host: localhost
+    host: 127.0.0.1
     port: 6379
-    password: 123456
+    password:
     database: 0
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8080
 
 paipai:
   server:
     host: 127.0.0.1
-    port: 7717
-    token: AAAAAA
+    wsPort: 8000
+    apiPort: 7717
+    token: xxxx
+    enabled: true
+    appInfo:
+      name: splatoon3-wechat-bot
+      author: 阿九九
+      version: 2.1
+      appIcon: https://img.kancloud.cn/cca72_50x50.png
+      description: Splatoon 3 微信机器人
+      file: C:\派派[2.3.00]
+      appid: 1
+      sensitive: 0
+
+netty:
+  wechat:
+    paipai:
+      server:
+        enabled: false
 
 file:
   uploadFolder: D://wxBot/
 
 qianfan:
-  accessKey: AAAA
-  secretKey: BBBBB
+  accessKey: accessKey
+  secretKey: secretKey
+
+volcEngine:
+  apiKey: apiKey

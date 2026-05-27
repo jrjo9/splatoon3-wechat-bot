@@ -1,8 +1,8 @@
 package com.mayday9.splatoonbot.business.service.wxmsg.query;
 
-import com.mayday9.splatoonbot.business.dto.wxmsg.req.WxUserInfoQueryDTO;
+import cn.hutool.json.JSONObject;
 import com.mayday9.splatoonbot.business.dto.wxmsg.resp.WxUserInfoQueryRespDTO;
-import com.mayday9.splatoonbot.common.util.WxMsgSendUtil;
+import com.mayday9.splatoonbot.common.util.PaipaiApiUtil;
 import com.mayday9.splatoonbot.common.web.response.ApiException;
 import com.mayday9.splatoonbot.common.web.response.ExceptionCode;
 import org.springframework.stereotype.Component;
@@ -21,11 +21,16 @@ public class WxUserInfoQueryService {
      * @return WxUserInfoQueryRespDTO
      */
     public WxUserInfoQueryRespDTO queryUserInfo(String wxid) {
-        WxUserInfoQueryDTO wxUserInfoQueryDTO = new WxUserInfoQueryDTO();
-        wxUserInfoQueryDTO.setType(201);
-        wxUserInfoQueryDTO.setWxid(wxid);
         try {
-            return WxMsgSendUtil.sendMessage(wxUserInfoQueryDTO, WxUserInfoQueryRespDTO.class);
+            JSONObject result = PaipaiApiUtil.queryContactInfo(wxid);
+            WxUserInfoQueryRespDTO respDTO = new WxUserInfoQueryRespDTO();
+            JSONObject dataObj = result.getJSONObject("Data");
+            respDTO.setWxid(dataObj != null ? dataObj.getStr("Wxid", "") : "");
+            respDTO.setName(dataObj != null ? dataObj.getStr("Nick", "") : "");
+            respDTO.setMark(dataObj != null ? dataObj.getStr("Remark", "") : "");
+            respDTO.setAccount(dataObj != null ? dataObj.getStr("Alias", "") : "");
+            respDTO.setHeadimg(dataObj != null ? dataObj.getStr("HeadImg", "") : "");
+            return respDTO;
         } catch (Exception e) {
             e.printStackTrace();
             throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "获取联系人信息失败");

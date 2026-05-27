@@ -8,7 +8,7 @@ spring:
     charset: UTF-8
     location: classpath:banner.txt
   profiles:
-    active: dev
+    active: @profile.active@
 
 logging:
   level:

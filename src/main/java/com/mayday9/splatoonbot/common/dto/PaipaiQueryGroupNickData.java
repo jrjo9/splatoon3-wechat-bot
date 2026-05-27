@@ -6,20 +6,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
+ * 查询群内昵称数据
+ *
  * @author Lianjiannan
- * @since 2024/9/14 10:16
+ * @since 2024/9/14
  **/
 @Setter
 @Getter
 @NoArgsConstructor
-public class WxMsgSendDTO {
+public class PaipaiQueryGroupNickData {
 
-    // 应用唯一标识
-    @Alias("CID")
-    private Integer cid;
+    // 成员WxID
+    @Alias("WxID")
+    private String wxId;
 
-    // 请求类型，固定
-    @Alias("Type")
-    private Integer type;
+    // 群ID
+    @Alias("RoomID")
+    private String roomId;
 
 }

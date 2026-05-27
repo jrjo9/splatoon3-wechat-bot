@@ -124,7 +124,7 @@ public class ChatWebSocketStrategy extends AbstractWebSocketStrategy {
         String response;
         switch (aiChatModel) {
             case AiChatModelConstant.ARK:
-                response = arkChatService.chatCompletion(aiChatMessageList);
+                response = arkChatService.botChatCompletion(aiChatMessageList);
                 break;
             case AiChatModelConstant.ERNIE_SPEED_8K:
                 response = baiduChatService.chatCompletion(content);

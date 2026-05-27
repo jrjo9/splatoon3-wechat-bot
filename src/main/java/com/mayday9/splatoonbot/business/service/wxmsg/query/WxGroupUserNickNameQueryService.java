@@ -1,7 +1,6 @@
 package com.mayday9.splatoonbot.business.service.wxmsg.query;
 
-import com.mayday9.splatoonbot.business.dto.wxmsg.req.WxGroupUserNameQueryDTO;
-import com.mayday9.splatoonbot.common.util.WxMsgSendUtil;
+import com.mayday9.splatoonbot.common.util.PaipaiApiUtil;
 import com.mayday9.splatoonbot.common.web.response.ApiException;
 import com.mayday9.splatoonbot.common.web.response.ExceptionCode;
 import org.springframework.stereotype.Component;
@@ -16,16 +15,13 @@ public class WxGroupUserNickNameQueryService {
     /**
      * 微信_取群昵称
      *
-     * @param gid 群ID
+     * @param gid  群ID
+     * @param wxid 成员WxID
      * @return String
      */
     public String queryGroupUserNickName(String gid, String wxid) {
-        WxGroupUserNameQueryDTO wxGroupUserNameQueryDTO = new WxGroupUserNameQueryDTO();
-        wxGroupUserNameQueryDTO.setType(217);
-        wxGroupUserNameQueryDTO.setGid(gid);
-        wxGroupUserNameQueryDTO.setWxid(wxid);
         try {
-            return WxMsgSendUtil.sendMessage(wxGroupUserNameQueryDTO, String.class);
+            return PaipaiApiUtil.queryGroupNickName(gid, wxid);
         } catch (Exception e) {
             e.printStackTrace();
             throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "获取群成员昵称失败！");

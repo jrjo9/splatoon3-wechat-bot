@@ -1,9 +1,9 @@
 package com.mayday9.splatoonbot.business.service.wxmsg.query;
 
-import com.mayday9.splatoonbot.business.dto.wxmsg.req.WxGroupUserInfoQueryDTO;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import com.mayday9.splatoonbot.business.dto.wxmsg.resp.WxGroupUserInfoDetailRespDTO;
-import com.mayday9.splatoonbot.business.dto.wxmsg.resp.WxGroupUserInfoRespDTO;
-import com.mayday9.splatoonbot.common.util.WxMsgSendUtil;
+import com.mayday9.splatoonbot.common.util.PaipaiApiUtil;
 import com.mayday9.splatoonbot.common.web.response.ApiException;
 import com.mayday9.splatoonbot.common.web.response.ExceptionCode;
 import org.springframework.stereotype.Component;
@@ -19,24 +19,30 @@ import java.util.List;
 public class WxGroupUserListQueryService {
 
     /**
-     * 微信_取群昵称
+     * 微信_取群成员列表
      *
      * @param gid 群ID
-     * @return String
+     * @return List<WxGroupUserInfoDetailRespDTO>
      */
     public List<WxGroupUserInfoDetailRespDTO> queryGroupUserList(String gid) {
-        WxGroupUserInfoQueryDTO wxGroupUserInfoQueryDTO = new WxGroupUserInfoQueryDTO();
-        wxGroupUserInfoQueryDTO.setType(204);
-        wxGroupUserInfoQueryDTO.setGid(gid);
         try {
-            WxGroupUserInfoRespDTO resp = WxMsgSendUtil.sendMessage(wxGroupUserInfoQueryDTO, WxGroupUserInfoRespDTO.class);
-            if (resp != null) {
-                return resp.getList();
+            JSONObject result = PaipaiApiUtil.queryGroupMemberList(gid);
+            List<WxGroupUserInfoDetailRespDTO> list = new ArrayList<>();
+            JSONObject dataObj = result.getJSONObject("Data");
+            if (dataObj != null && dataObj.containsKey("List") && dataObj.get("List") != null) {
+                JSONArray jsonArray = dataObj.getJSONArray("List");
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONObject item = jsonArray.getJSONObject(i);
+                    WxGroupUserInfoDetailRespDTO dto = new WxGroupUserInfoDetailRespDTO();
+                    dto.setWxid(item.getStr("Wxid", ""));
+                    dto.setName(item.getStr("Nick", ""));
+                    list.add(dto);
+                }
             }
+            return list;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "获取群成员昵称失败！");
+            throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "获取群成员列表失败！");
         }
-        return new ArrayList<>();
     }
 }

@@ -1,7 +1,7 @@
 package com.mayday9.splatoonbot.business.service.wxmsg.query;
 
-import com.mayday9.splatoonbot.business.dto.wxmsg.req.WxGroupNameQueryDTO;
-import com.mayday9.splatoonbot.common.util.WxMsgSendUtil;
+import cn.hutool.json.JSONObject;
+import com.mayday9.splatoonbot.common.util.PaipaiApiUtil;
 import com.mayday9.splatoonbot.common.web.response.ApiException;
 import com.mayday9.splatoonbot.common.web.response.ExceptionCode;
 import org.springframework.stereotype.Component;
@@ -20,11 +20,10 @@ public class WxGroupNameQueryService {
      * @return String
      */
     public String queryGroupName(String gid) {
-        WxGroupNameQueryDTO groupNameQueryDTO = new WxGroupNameQueryDTO();
-        groupNameQueryDTO.setType(208);
-        groupNameQueryDTO.setGid(gid);
         try {
-            return WxMsgSendUtil.sendMessage(groupNameQueryDTO, String.class);
+            JSONObject result = PaipaiApiUtil.queryContactInfo(gid);
+            JSONObject dataObj = result.getJSONObject("Data");
+            return dataObj != null ? dataObj.getStr("Nick", "") : "";
         } catch (Exception e) {
             e.printStackTrace();
             throw new ApiException(ExceptionCode.ParamIllegal.getCode(), "获取群昵称失败！");

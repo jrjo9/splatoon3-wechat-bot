@@ -197,9 +197,9 @@ public class NSOServiceImpl implements NSOService {
         sb.append("=======鲑鱼跑======").append("\n")
             .append("段位：").append(coopSummary.getJSONObject("data").getJSONObject("coopResult").getJSONObject("regularGrade").getStr("name")).append("\n")
             .append("鳞片：[")
-            .append("[emoji=D83E][emoji=DD47]：").append(coopSummary.getJSONObject("data").getJSONObject("coopResult").getJSONObject("scale").getInt("gold"))
-            .append("，[emoji=D83E][emoji=DD48]：").append(coopSummary.getJSONObject("data").getJSONObject("coopResult").getJSONObject("scale").getInt("silver"))
-            .append("，[emoji=D83E][emoji=DD49]：").append(coopSummary.getJSONObject("data").getJSONObject("coopResult").getJSONObject("scale").getInt("bronze"))
+            .append("🥇：").append(coopSummary.getJSONObject("data").getJSONObject("coopResult").getJSONObject("scale").getInt("gold"))
+            .append("，🥈：").append(coopSummary.getJSONObject("data").getJSONObject("coopResult").getJSONObject("scale").getInt("silver"))
+            .append("，🥉：").append(coopSummary.getJSONObject("data").getJSONObject("coopResult").getJSONObject("scale").getInt("bronze"))
             .append("]\n")
             .append("打工次数：").append(coopSummary.getJSONObject("data").getJSONObject("coopResult").getJSONObject("pointCard").getInt("playCount")).append("\n");
         log.info(sb.toString());
@@ -328,12 +328,12 @@ public class NSOServiceImpl implements NSOService {
         }
         sb.append("==================\n");
         for (CoopDetailPlayerVO playerVO : coopDetailVO.getPlayerList()) {
-            sb.append("[emoji=D83E][emoji=DD91]").append(playerVO.getPlayerName()).append("\n")
-                .append("[emoji=D83D][emoji=DC1F]：x ").append(playerVO.getDefeatEnemyCount()).append("\n")
-                .append("[emoji=D83D][emoji=DFE1]：x ").append(playerVO.getGoldenDeliverCount()).append("(").append(playerVO.getGoldenAssistCount()).append(")\n")
-                .append("[emoji=D83D][emoji=DD34]：x ").append(playerVO.getDeliverCount()).append("\n")
-                .append("[emoji=D83D][emoji=DE91]：x ").append(playerVO.getRescueCount()).append("\n")
-                .append("[emoji=D83D][emoji=DEDF]：x ").append(playerVO.getRescuedCount()).append("\n");
+            sb.append("🦈").append(playerVO.getPlayerName()).append("\n")
+                .append("💀：x ").append(playerVO.getDefeatEnemyCount()).append("\n")
+                .append("🍞：x ").append(playerVO.getGoldenDeliverCount()).append("(").append(playerVO.getGoldenAssistCount()).append(")\n")
+                .append("🥚：x ").append(playerVO.getDeliverCount()).append("\n")
+                .append("🦜：x ").append(playerVO.getRescueCount()).append("\n")
+                .append("😵：x ").append(playerVO.getRescuedCount()).append("\n");
             sb.append("\n");
         }
         sb.append("------------排行榜-----------\n\n");
@@ -341,17 +341,17 @@ public class NSOServiceImpl implements NSOService {
         int no = 1;
         for (CoopDetailPlayerVO playerVO : coopDetailVO.getPlayerList()) {
             if (no == 1) {
-                sb.append("[emoji=D83E][emoji=DD47]");
+                sb.append("🥇");
             } else if (no == 2) {
-                sb.append("[emoji=D83E][emoji=DD48]");
+                sb.append("🥈");
             } else if (no == 3) {
-                sb.append("[emoji=D83E][emoji=DD49]");
+                sb.append("🥉");
             } else {
-                sb.append("[emoji=D83D][emoji=DE30]");
+                sb.append("🐙");
             }
-            sb.append(playerVO.getPlayerName()).append("[emoji=D83E][emoji=DEE7]").append(playerVO.getRankScore());
+            sb.append(playerVO.getPlayerName()).append("⚔️").append(playerVO.getRankScore());
             if (no == 1) {
-                sb.append("[emoji=D83D][emoji=DC51]");
+                sb.append("👑");
             }
             sb.append("\n");
             no++;
@@ -423,18 +423,18 @@ public class NSOServiceImpl implements NSOService {
         StringBuilder sb = new StringBuilder();
         sb.append(battleDetailVO.getMatchName()).append("==[  ").append(battleDetailVO.getJudgement()).append("  ]==\n")
             .append("===============\n")
-            .append("[emoji=D83C][emoji=DFAE]我方队伍\n");
+            .append("🏳️我方队伍\n");
         for (BattleDetailPlayerVO playerVO : battleDetailVO.getMyTeamPlayerList()) {
-            sb.append("[emoji=D83D][emoji=DD30]").append(playerVO.getPlayerName()).append("\n")
+            sb.append("🦑").append(playerVO.getPlayerName()).append("\n")
                 .append(playerVO.getKill()).append("(").append(playerVO.getAssist()).append(")/")
                 .append(playerVO.getDeath()).append("/")
                 .append(playerVO.getSpecial()).append("    ")
                 .append(playerVO.getPaint())
                 .append("p\n");
         }
-        sb.append("\n[emoji=D83C][emoji=DFAE]敌方队伍\n");
+        sb.append("\n🏴敌方队伍\n");
         for (BattleDetailPlayerVO playerVO : battleDetailVO.getEnemyTeamPlayerList()) {
-            sb.append("[emoji=D83D][emoji=DD30]").append(playerVO.getPlayerName()).append("\n")
+            sb.append("🦑").append(playerVO.getPlayerName()).append("\n")
                 .append(playerVO.getKill()).append("(").append(playerVO.getAssist()).append(")/")
                 .append(playerVO.getDeath()).append("/")
                 .append(playerVO.getSpecial()).append("    ")
@@ -449,17 +449,17 @@ public class NSOServiceImpl implements NSOService {
         int no = 1;
         for (BattleDetailPlayerVO playerVO : allPlayerList) {
             if (no == 1) {
-                sb.append("[emoji=D83E][emoji=DD47]");
+                sb.append("🥇");
             } else if (no == 2) {
-                sb.append("[emoji=D83E][emoji=DD48]");
+                sb.append("🥈");
             } else if (no == 3) {
-                sb.append("[emoji=D83E][emoji=DD49]");
+                sb.append("🥉");
             } else {
                 sb.append(" ").append(no).append(". ");
             }
-            sb.append(playerVO.getPlayerName()).append("[emoji=D83C][emoji=DF88]").append(playerVO.getRankScore());
+            sb.append(playerVO.getPlayerName()).append("⚔️").append(playerVO.getRankScore());
             if (no == 1) {
-                sb.append("[emoji=D83C][emoji=DFC6]");
+                sb.append("🏆");
             }
             sb.append("\n");
             no++;

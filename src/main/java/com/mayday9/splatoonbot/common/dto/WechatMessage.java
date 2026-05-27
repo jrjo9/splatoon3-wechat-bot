@@ -54,5 +54,8 @@ public class WechatMessage {
     @Alias(value = "AtList")
     private String atList;
 
+    // 是否略过（不进行激活群组检查）
+    private boolean skipped;
+
 
 }

@@ -47,16 +47,16 @@ public class StatisticsTask {
                 content = "今日还没有人发言~";
             } else {
                 StringBuilder sb = new StringBuilder();
-                sb.append("[emoji=D83D][emoji=DCE2]该睡觉咯，亲爱的鱿鱿们！[emoji=D83D][emoji=DCA4]").append("\n");
-                sb.append("[emoji=D83D][emoji=DCE2]以下播报【今日龙王[emoji=D83D][emoji=DC32]】排行榜").append("\n")
+                sb.append("📢该睡觉咯，亲爱的鱿鱿们！💤").append("\n");
+                sb.append("📢以下播报【今日龙王🐲】排行榜").append("\n")
                     .append("==================\n");
                 for (TodayStatisticsRankDTO todayStatisticsRankDTO : todayStatisticsRankDTOList) {
                     if (todayStatisticsRankDTO.getRank() == 1) {
-                        sb.append("[emoji=D83E][emoji=DD47]");
+                        sb.append("🥇");
                     } else if (todayStatisticsRankDTO.getRank() == 2) {
-                        sb.append("[emoji=D83E][emoji=DD48]");
+                        sb.append("🥈");
                     } else if (todayStatisticsRankDTO.getRank() == 3) {
-                        sb.append("[emoji=D83E][emoji=DD49]");
+                        sb.append("🥉");
                     } else {
                         sb.append(todayStatisticsRankDTO.getRank()).append(". ");
                     }

@@ -101,7 +101,7 @@ public class ChatWxMsgService extends PaipaiWxMsgStrategy {
                 content = baiduChatService.chatCompletion(message);
                 break;
             case AiChatModelConstant.ARK:
-                content = arkChatService.chatCompletion(aiChatMessageList);
+                content = arkChatService.botChatCompletion(aiChatMessageList);
                 break;
             default:
                 content = "未配置大模型，请联系管理员！";

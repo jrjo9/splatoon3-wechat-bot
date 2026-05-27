@@ -2,6 +2,8 @@ package com.mayday9.splatoonbot.business.service.ai;
 
 import com.mayday9.splatoonbot.business.dto.AiChatMessage;
 import com.mayday9.splatoonbot.common.config.VolcEngineConfig;
+import com.volcengine.ark.runtime.model.bot.completion.chat.BotChatCompletionRequest;
+import com.volcengine.ark.runtime.model.bot.completion.chat.BotChatCompletionResult;
 import com.volcengine.ark.runtime.model.completion.chat.*;
 import com.volcengine.ark.runtime.service.ArkService;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +44,7 @@ public class ArkChatService {
 
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
                 // 指定您创建的方舟推理接入点 ID，此处已帮您修改为您的推理接入点 ID
-                .model("doubao-seed-2-0-lite-260428")
+                .model("ep-20260527104650-vpm2x")
                 .messages(messages)
                 .build();
         ChatCompletionResult response = service.createChatCompletion(chatCompletionRequest);
@@ -53,7 +55,7 @@ public class ArkChatService {
     /**
      * 普通对话 - 多对话
      *
-     * @param message 用户消息
+     * @param messageList 用户消息
      * @return BotChatCompletionResult
      */
     public String chatCompletion(List<AiChatMessage> messageList) {
@@ -70,13 +72,69 @@ public class ArkChatService {
 
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
                 // 指定您创建的方舟推理接入点 ID，此处已帮您修改为您的推理接入点 ID
-                .model("doubao-seed-2-0-lite-260428")
+                .model("ep-20260527104650-vpm2x")
                 .messages(messages)
                 .build();
         ChatCompletionResult response = service.createChatCompletion(chatCompletionRequest);
         log.info("AI对话返回内容：" + response.getChoices().get(0).getMessage().stringContent());
         return response.getChoices().get(0).getMessage().stringContent();
     }
+
+    /**
+     * bot chat 单次对话
+     *
+     * @param message
+     * @return String
+     */
+    public String botChatCompletion(String message) {
+        ArkService service = volcEngineConfig.buildService();
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage systemMessage = ChatMessage.builder().role(ChatMessageRole.SYSTEM)
+                .content(SYSTEM_ROLE_TEXT)
+                .build();
+        ChatMessage userMessage = ChatMessage.builder().role(ChatMessageRole.USER).content(message).build();
+        messages.add(systemMessage);
+        messages.add(userMessage);
+
+        BotChatCompletionRequest botChatCompletionRequest = BotChatCompletionRequest.builder()
+                // 指定您创建的方舟推理接入点 ID，此处已帮您修改为您的推理接入点 ID
+                .model("bot-20260527111238-k6hxb")
+                .messages(messages)
+                .build();
+        BotChatCompletionResult response = service.createBotChatCompletion(botChatCompletionRequest);
+        log.info("AI对话返回内容：" + response.getChoices().get(0).getMessage().stringContent());
+        return response.getChoices().get(0).getMessage().stringContent();
+    }
+
+
+    /**
+     * bot chat 多次次对话
+     *
+     * @param messageList
+     * @return String
+     */
+    public String botChatCompletion(List<AiChatMessage> messageList) {
+        ArkService service = volcEngineConfig.buildService();
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage systemMessage = ChatMessage.builder().role(ChatMessageRole.SYSTEM)
+                .content(SYSTEM_ROLE_TEXT)
+                .build();
+        messages.add(systemMessage);
+        for (AiChatMessage message : messageList) {
+            ChatMessage userMessage = ChatMessage.builder().role(message.getRole()).content(message.getMessage()).build();
+            messages.add(userMessage);
+        }
+
+        BotChatCompletionRequest botChatCompletionRequest = BotChatCompletionRequest.builder()
+                // 指定您创建的方舟推理接入点 ID，此处已帮您修改为您的推理接入点 ID
+                .model("bot-20260527111238-k6hxb")
+                .messages(messages)
+                .build();
+        BotChatCompletionResult response = service.createBotChatCompletion(botChatCompletionRequest);
+        log.info("AI对话返回内容：" + response.getChoices().get(0).getMessage().stringContent());
+        return response.getChoices().get(0).getMessage().stringContent();
+    }
+
 
 
 }

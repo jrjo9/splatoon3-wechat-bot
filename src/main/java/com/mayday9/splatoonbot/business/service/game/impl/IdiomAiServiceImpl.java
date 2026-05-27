@@ -77,7 +77,7 @@ public class IdiomAiServiceImpl implements IdiomAiService {
         }
 
         if (AiChatModelConstant.ARK.equals(aiChatModel)) {
-            return arkChatService.chatCompletion(prompt);
+            return arkChatService.botChatCompletion(prompt);
         } else {
             return baiduChatService.chatCompletion(prompt);
         }

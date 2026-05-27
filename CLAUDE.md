@@ -11,19 +11,16 @@
 
 ### 核心组件
 
-1. **Netty Server** (`PaipaiWechatNettyServer`)：监听 9933 端口，接收派派转发的微信消息
+1. **WebSocket 客户端** (`PaipaiWebSocketClient`)：连接派派框架 WSS，接收微信消息
 2. **策略模式** (`PaipaiWxMsgStrategy`)：每个命令关键词通过 `@WxMsgType` 注解映射到对应策略实现
 3. **策略上下文** (`PaipaiWxMsgStrategyContext`)：启动时自动注册所有策略 Bean，按关键词路由消息
 4. **定时任务**：`SplatDataRefreshTask` 从 splatoon3.ink API 获取 Splatoon 3 数据
 
 ### 目录结构
 
-- `netty/` - Netty 服务器、通道、处理器、策略
+- `websocket/` - WebSocket 客户端及相关处理器
+- `netty/` - 保留内部服务（如 WebSocketServer）
 - `business/service/wxmsg/receive/` - 消息处理策略（basic、nso、splatoon、system）
-- `business/service/wxmsg/send/` - 微信消息发送器
-- `business/service/ai/` - AI 聊天服务（百度千帆、DeepSeek）
-- `business/task/` - 数据刷新定时任务
-- `business/infrastructure/mapper/` - MyBatis mapper
 
 ## 构建和运行
 
@@ -67,13 +64,17 @@ public class YourCommandWxMsgService extends PaipaiWxMsgStrategy {
 
 3. 启动时自动注册
 
-## 派派 API 集成
+## 派派框架集成
 
-机器人使用派派WeChat HTTP API 发送消息：
+通过 **WebSocket 客户端** 连接派派框架（WSS://host:8000），接收微信消息事件。
 
-- API 端点：`http://{host}:{port}/`
-- 通过 `paipai.server.token` 认证
-- `service/wxmsg/send/` 下的发送器支持文本、图片、文件、卡片等消息类型
+### 流程
+1. 连接 WSS → 发送应用注册（Type:1000）→ 接收 CID（Type:999）→ 接收消息（Type:1001）
+2. 调用框架 API：通过 POST 请求发送消息
+
+### 组件
+- `websocket/client/PaipaiWebSocketClient.java` - WebSocket 客户端
+- `websocket/handler/PaipaiWsMsgHandler.java` - 业务消息处理器
 
 ## 数据持久化
 
@@ -86,3 +87,5 @@ public class YourCommandWxMsgService extends PaipaiWxMsgStrategy {
 
 - Netty 通过 `@Async` 异步运行，自定义线程池拒绝策略
 - **敏感数据禁止写入 `settings.json`**：数据库密码、API 密钥等敏感信息只能放在 `settings.local.json`（已被 .gitignore 忽略，不会提交到仓库）
+- 本地启动服务时，profile.active为dev
+- **调试后必须关闭服务**：启动服务测试后，使用 `taskkill //F //PID <PID>` 关闭进程，避免端口占用导致下次启动失败

@@ -26,7 +26,7 @@ public class WxMsgConstant {
 
     public final static String REGISTER = "。激活群组";
 
-    public final static String CHAT = "@魔魔胡胡胡萝卜[emoji=D83E][emoji=DD55] ";
+    public final static String CHAT = "@魔魔胡胡胡萝卜\uD83E\uDD55 ";
 
     public final static String NSO_AUTH_URL = "nso登录";
 

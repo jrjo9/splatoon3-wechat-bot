@@ -6,20 +6,30 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
+ * 派派框架 API 请求基类
+ *
  * @author Lianjiannan
- * @since 2024/9/14 10:16
+ * @since 2024/9/14
  **/
 @Setter
 @Getter
 @NoArgsConstructor
-public class WxMsgSendDTO {
+public class PaipaiApiRequest {
+
+    // 框架验证码
+    @Alias("ToKen")
+    private String token;
 
     // 应用唯一标识
     @Alias("CID")
     private Integer cid;
 
-    // 请求类型，固定
+    // API类型，区分不同的消息类型或操作
     @Alias("Type")
     private Integer type;
+
+    // 消息数据
+    @Alias("Data")
+    private Object data;
 
 }
